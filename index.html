@@ -42,6 +42,45 @@ and open the template in the editor.
 
             </div>
 
+            <div id="user-prompt-area">
+                <input id="new-trail-button" name="New Trail" type="button" value="Create New Trail">
+                </br>
+                </br>
+                <h2>or choose and existing one...</h2>
+                
+                <ul id="trail-grid">
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>
+                    <li>
+                        <a href="#"> Trail 1</a>
+                    </li>   
+
+                </ul>
+
+            </div>
+
             <div id="content-area">
                 <div id="memex-area">
                     <div id="memex-input">
@@ -52,8 +91,17 @@ and open the template in the editor.
 
                             <h2><label>Add a link</label></h2>
                             <input name="memex-form-link" class="memex-form-text" id="memex-form-link" type="text" placeholder="http://">
+                            <h2>Select Category</h2>
+
+
+                            <div id="category-radio">
+                                <input type="radio" name="cat-group" value="Eat" title="Eat" checked> Eat
+                                <input type="radio" name="cat-group" value="See" title="See"> See
+                                <input type="radio" name="cat-group" value="Do" title="Do"> Do
+                            </div>
 
                             <h2>Add Tags</h2>
+
                             <input name="memex-form-tags" class="memex-form-text" id="memex-form-tags" type="text"placeholder="Enter comma seperated tags">
 
                             <input id="submit_button" type="submit" value="Add Link">
@@ -64,21 +112,13 @@ and open the template in the editor.
                         <h2>Trail is Empty</h2>
 
                     </div>
-                    <div id="memex-list">
-                        <h2>
-                            <label id="count-label" > in trail
-                        </h2>
+                    <div id="memex-list">      
+                        <label id="count-label"></label> in trail
                         <ol>
-
                         </ol>
-
                     </div>
-
                 </div>
-
                 <div id="map-and-recommendations">
-                    <div id="map-canvas"/>
-                    </br>
                     <div id="recommendations">
                         <h2> <label>We suggest...</label></h2>
                         <div id="eat_list" class="recommended-list">
@@ -97,11 +137,17 @@ and open the template in the editor.
 
                             </ol>
                         </div>
+
+                        <!--
+                        </br>
+                    </br>
+                       <div id="map-canvas"></div>
+                        -->
                     </div>
                 </div>
-            </div>
-            <div id="page_footer">
+                <div id="page_footer">
 
+                </div>
             </div>
         </div>
     </body>
