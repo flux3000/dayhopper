@@ -1,26 +1,159 @@
 /* content */
+
+/*
 body {
     font-family: 'Raleway', sans-serif;
     background-color: #333;
 }
 
 #title {
-	font-size: 24pt;
-	font-weight: bold;
-	padding: 12px;
+        font-size: 24pt;
+        font-weight: bold;
+        padding: 12px;
 }
 
 #container {
-	margin: 40px auto;
-	overflow: hidden;
-	padding: 12px;
-	width: 1000px;
-	background-color: #FFF;
-	border: 1px solid #999;
-	border-radius: 8px;
-	box-shadow: 3px 3px 2px #222;
+        margin: 40px auto;
+        overflow: hidden;
+        padding: 12px;
+        width: 1000px;
+        background-color: #FFF;
+        border: 1px solid #999;
+        border-radius: 8px;
+        box-shadow: 3px 3px 2px #222;
 }
 
 #content {
-	padding: 12px;
+        padding: 12px;
 }
+*/
+
+
+body{
+    background-color:#DEEBF7;
+    font-family: 'Ropa Sans', sans-serif;
+}
+#container {
+    width: 1000px;
+    margin: 0px auto;
+    border-radius: 0px;
+}
+#container h1{
+    font-size:large;
+
+}
+
+#title{
+    width:100%;
+    text-align: center;
+    padding:10px 0px;
+    background-color: #44546A;
+}
+#title h1{
+    color: #FFC000;
+    font-size: xx-large;
+
+}
+#content-area{
+    padding: 20px 10px;
+    overflow: auto;
+    background-color:white;
+}
+#memex-area{
+    width:360px;
+    float: left;
+    padding:10px;
+
+
+    border: 1px solid #DEEBF7;
+}
+#memex-input{
+    background-color: white;
+
+}
+
+
+#map-and-recommendations{
+    width:570px;
+    text-align: center;
+    padding:10px 0px 10px 10px;
+    margin-left:10px;
+   display: inline-block;
+    background-color:#DEEBF7;
+    
+}
+
+#map-canvas{
+    height: 300px;
+    width: 550px;
+    display: inline-block;
+    float: none;
+}
+#recommendations{
+display: inline-block;
+width:550px;
+}
+
+.recommended-list{
+    text-align:center;
+    width:178px;
+    background-color: white;
+    padding:5px 0px;
+    margin-right:10px;
+    float:left;
+    border: 1px solid #DEEBF7;
+
+
+}
+
+
+
+#empty-memex-list{
+    display:none;
+}
+
+
+.memex-form-text{
+    width:360px;
+
+    height:30px;
+    margin-bottom:10px;
+    display:block-inline
+}
+
+.trail-link{
+    height: 90spx;
+    overflow: hidden;
+    padding:5px;
+}
+
+.trail-link img{
+    width: 80px;
+    height: 80px;
+    float:left;
+    margin-right: 5px;
+
+}
+.trail-link a{
+    height:20px;
+    color: #4472C4;
+}
+.trail-link p{
+    color:#a2a2a2;
+    overflow: hidden;
+    height: 20px;
+}
+
+.trail-link-tags{
+    height:20px;
+    display:inline;
+
+}
+.trail-link-tags li{
+    display: inline;
+    background-color: #DEEBF7;
+    margin-right:5px;
+    padding:2px;
+    font-size: small;
+}
+
