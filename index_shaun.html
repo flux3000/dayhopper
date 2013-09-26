@@ -11,8 +11,6 @@
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script src="_js/script.js"></script>    
     <script type="text/javascript">
-        $(document).ready(function() {
-
 
         /*
         * addLink
@@ -41,8 +39,32 @@
             });
         };
 
+        /*
+        * renameTag
+        *
+        *
+        *
+        * Simple rename of tag, will be useful for re-ordering the steps
+        * Currently not working.  Anyone see why?
+        */
+        function renameTag(old, anew) {
+           $.ajax({
+                type: "POST",
+                url: "delicious_proxy.php",
+                data: { username: "dantsai", password: "npoc3opDL", method: "tags/rename", old: old, new: anew }
+            }).done(function( msg ) {
+                console.log(msg);
+            });
+        }
 
+        $(document).ready(function() {
 
+            var old = "brewpubs-step1";
+            var new = "brewpubs-step0";
+            renameTag(old, new);
+        });
+
+            /*
 
 
             //$.getJSON("https://dantsai:npoc3opDL@api.delicious.com/v1/tags/rename?callback=?old=mytrail&new=hahaha",
@@ -92,7 +114,9 @@
                     //alert( "Reorder done: " + msg );
                 });
             });
-        };
+
+        */
+        
 
 
 
