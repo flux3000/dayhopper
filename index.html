@@ -43,39 +43,14 @@ and open the template in the editor.
             </div>
 
             <div id="user-prompt-area">
+                <input id="new-trail-name" name='New Trail Name' type='text' placeholder='Enter new trail name'>
+                </br>   
                 <input id="new-trail-button" name="New Trail" type="button" value="Create New Trail">
                 </br>
                 </br>
                 <h2>or choose and existing one...</h2>
-                
+
                 <ul id="trail-grid">
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>
-                    <li>
-                        <a href="#"> Trail 1</a>
-                    </li>   
 
                 </ul>
 
@@ -85,26 +60,30 @@ and open the template in the editor.
                 <div id="memex-area">
                     <div id="memex-input">
                         <form id="memex-form">
-                            <h2><label>Name your trail</label></h2>
-
-                            <input name="memex-form-name" class="memex-form-text" id="memex-form-name" type="text" placeholder="Name your trail">
+                            <div id='memex-trail-title'>
+                                <h2><label>Trail: </label> <label name='memex-trail-name' id='memex-trail-name'></label></h2>
+                            </div>
+                            </br>
 
                             <h2><label>Add a link</label></h2>
+
                             <input name="memex-form-link" class="memex-form-text" id="memex-form-link" type="text" placeholder="http://">
-                            <h2>Select Category</h2>
-
-
-                            <div id="category-radio">
-                                <input type="radio" name="cat-group" value="Eat" title="Eat" checked> Eat
-                                <input type="radio" name="cat-group" value="See" title="See"> See
-                                <input type="radio" name="cat-group" value="Do" title="Do"> Do
-                            </div>
-
+                            <!--
+                             <h2>Select Category</h2>
+ 
+ 
+                             <div id="category-radio">
+                                 <input type="radio" name="cat-group" value="Eat" title="Eat" checked> Eat
+                                 <input type="radio" name="cat-group" value="See" title="See"> See
+                                 <input type="radio" name="cat-group" value="Do" title="Do"> Do
+                             </div>
+                            -->
                             <h2>Add Tags</h2>
 
                             <input name="memex-form-tags" class="memex-form-text" id="memex-form-tags" type="text"placeholder="Enter comma seperated tags">
 
                             <input id="submit_button" type="submit" value="Add Link">
+                            </br>
                         </form> 
                     </div>
                     <div id="empty-memex-list">
@@ -113,7 +92,6 @@ and open the template in the editor.
 
                     </div>
                     <div id="memex-list">      
-                        <label id="count-label"></label> in trail
                         <ol>
                         </ol>
                     </div>
@@ -138,11 +116,11 @@ and open the template in the editor.
                             </ol>
                         </div>
 
-                        <!--
+
                         </br>
-                    </br>
-                       <div id="map-canvas"></div>
-                        -->
+                        </br>
+                        <div id="map-canvas"></div>
+
                     </div>
                 </div>
                 <div id="page_footer">
