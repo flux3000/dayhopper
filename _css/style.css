@@ -120,11 +120,13 @@ input[type=submit]{
 
     padding:10px;
     margin: 0px -10px;
-
-    background-color:#5B9BD5;
-    color:white;
 }
 
+#recommendations-title{
+
+    padding:10px;
+
+}
 #empty-memex-list{
     display:none;
 }
@@ -138,12 +140,12 @@ input[type=submit]{
 }
 
 #map-and-recommendations{
-    width:570px;
+    width:590px;
     text-align: center;
-    padding:10px 0px 10px 10px;
+    padding:0px;
     margin-left:10px;
     display: inline-block;
-    background-color:#DEEBF7;
+
 
 }
 
@@ -153,25 +155,46 @@ input[type=submit]{
     display: inline-block;
     float: none;
 }
+
+.column-titles{
+    background-color:#5B9BD5;
+    color:white;
+    padding:5px 0px;
+}
+
+.recommendation-title{
+    background-color:#DEEBF7;
+    color:black;
+    padding:5px 0px;
+}
 #recommendations{
     display: inline-block;
-    width:570px;
+    width:100%;
     float:none;
 }
 
 .recommended-list{
     text-align:center;
-    width:178px;
+    width:194.66666px;
     background-color: white;
-    padding:5px 0px;
-    margin-right:10px;
+
     float:left;
     border: 1px solid #DEEBF7;
-
-
+    height: 100%;
 }
 
+.recommended-list ol{
 
+}
+.recommended-list li{
+    padding:5px;
+    margin-bottom:0px;
+    border-bottom: 1px dashed #DEEBF7;
+}
+.recommended-list li:hover{
+    background-color:#DEEBF7;
+    border:1px solid #4472C4;
+}
 
 .trail-item{
     height: 60spx;
@@ -181,7 +204,8 @@ input[type=submit]{
 }
 
 .trail-item:hover{
-    background-color: #FFC000;
+    background-color: #DEEBF7;
+    border:1px solid #4472C4;
 }
 .trail-item img{
     width: 86px;
@@ -202,16 +226,31 @@ input[type=submit]{
 
 .trail-item-tags{
 
- display: inline-block;
+    display: inline-block;
 }
 .trail-item-tags li{ 
-  
+    background-color: none;
     display:block;
     float:left;
-   
+
     background-color: #DEEBF7;
     margin-right:5px;
     padding:5px;
     font-size: small;
+    z-index:2;
 }
 
+.trail-item-order{
+
+    z-index: 1;
+    position:absolute;
+    text-align: center;
+    font-size: 80pt;
+    width:340px;
+    opacity:.1;
+    color: #4472C4
+}
+
+.trail-item-order:hover{
+    opacity:.7;
+}

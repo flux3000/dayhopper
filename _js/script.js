@@ -2,7 +2,7 @@ $(document).ready(function() {
     init();
 })
 
-
+var JSON_READ = "http://feeds.delicious.com/v2/json/dantsai?count=100&callback=?";
 
 function init() {
 
@@ -13,6 +13,7 @@ function init() {
     addTrailItemFromForm();
     updateTrailCountLabel();
     isTrailEmpty();
+    loadRecommendations();
 
 
 
@@ -42,7 +43,7 @@ function addTest()
 
         var date = new Date();
 
-        var trailItem = CreateTrailItemFromText(name, link, tags, date)
+        var trailItem = createTrailItemFromText(name, link, tags, date)
         addTrailItemToMemex(trailItem);
 
     }
@@ -90,6 +91,7 @@ function formatTrailItemHTML() {
     /*
      item += "<img src='" + this.image + "' alt='IMAGE'/>";
      */
+    item += "<div class='trail-item-order' value='" + this.order + "'>" + this.order + "</div>";
     item += this.parseTrailItemLink();
     item += "</br><p>" + getNiceTime(this.date) + "</p>";
     item += "</br><ul class='trail-item-tags'>";
@@ -97,11 +99,22 @@ function formatTrailItemHTML() {
     for (var i = 0; i < this.tags.length; i++)
     {
         item += "<li>" + this.tags[i] + "</li>";
-
     }
     item += "</ul>";
     item += "</div></li>";
     return item;
+}
+
+function createTrailItemFromJSON(item)
+{
+    var trailItem = new TrailItem();
+
+    trailItem.title = item.d;
+    trailItem.url = item.u;
+    trailItem.date = item.dt;
+    trailItem.tags = item.t;
+    return trailItem;
+
 }
 
 /**
@@ -110,9 +123,9 @@ function formatTrailItemHTML() {
  * @param {String} link
  * @param {Array of Strings} tags
  * @param {Date} date
- * @returns {CreateTrailItemFromText.trailItem|TrailItem}
+ * @returns {createTrailItemFromText.trailItem|TrailItem}
  */
-function CreateTrailItemFromText(title, url, tags, date) {
+function createTrailItemFromText(title, url, tags, date) {
     var trailItem = new TrailItem();
     trailItem.title = title;
     trailItem.url = url;
@@ -225,14 +238,11 @@ function updateTrailCountLabel() {
  */
 function getTrailListFromDelicious(updateHTML) {
     var trails = [];
-    $.getJSON("http://feeds.delicious.com/v2/json/dantsai?callback=?",
+    $.getJSON(JSON_READ,
             function(data) {
 
                 $.each(data, function(i, item) {
                     console.log("Data fetched");
-                    var title = item.d;
-                    var url = item.u;
-                    var date = item.dt;
                     var tags = item.t;
 
                     if ($.inArray("Dummy", tags) > -1) {
@@ -259,28 +269,23 @@ function getTrailListFromDelicious(updateHTML) {
 
 }
 
-function getTrailItemsFromDelicoius(trailName, updateHTML)
+function getTrailItemsFromDelicious(trailName, updateHTML)
 {
     var trailItems = [];
 
-    $.getJSON("http://feeds.delicious.com/v2/json/dantsai?count=100&callback=?",
+    $.getJSON(JSON_READ,
             function(data) {
-                console.log("size src:" + data.length);
+
                 $.each(data, function(i, item) {
 
-                    var trailItem = new TrailItem();
-
-                    trailItem.title = item.d;
-                    trailItem.url = item.u;
-                    trailItem.date = item.dt;
-                    trailItem.tags = item.t;
+                    var trailItem = createTrailItemFromJSON(item);
 
                     if ($.inArray(trailName, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
                         trailItems.push(trailItem);
                     }
 
                 });
-                console.log("size org:" + trailItems.length);
+
                 trailItems = sortTrailItems(trailItems, trailName);
 
 
@@ -291,16 +296,19 @@ function getTrailItemsFromDelicoius(trailName, updateHTML)
                         addTrailItemToMemex(trailItems[i]);
                 }
                 $(".ajax-loader").css("display", "none");
+
                 return trailItems;
             });
+
+    return trailItems;
 }
 
 function sortTrailItems(trailItems, trailName) {
-    console.log("sorting");
+
     var newTrailItems = [];
     var i = 0;
-   /* console.log("Size=" + trailItems.length);
-    console.log("i\tti\tindex");*/
+    /* console.log("Size=" + trailItems.length);
+     console.log("i\tti\tindex");*/
     for (var i = 1; i <= trailItems.length; i++)
     {
         for (var ti in trailItems)
@@ -310,10 +318,10 @@ function sortTrailItems(trailItems, trailName) {
 
 
             var index = $.inArray(trailName + "-step" + (i), trailItem.tags)
-           /* console.log(i + "\t" + ti + "\t" + index + "\t" + trailItem.tags);*/
-            if (index >-1)
+            /* console.log(i + "\t" + ti + "\t" + index + "\t" + trailItem.tags);*/
+            if (index > -1)
             {
-               /* console.log("Order found:" + trailItem.tags);*/
+                /* console.log("Order found:" + trailItem.tags);*/
                 trailItem.order = index;
                 newTrailItems.push(trailItem);
                 break;
@@ -393,7 +401,7 @@ function addEventLoadTrailItemsByTrail()
         displayContentArea(true);
         displayUserPromptArea(false);
         $("#memex-trail-name").text(selectedTrail);
-        getTrailItemsFromDelicoius(selectedTrail, true);
+        getTrailItemsFromDelicious(selectedTrail, true);
     });
 }
 
@@ -411,4 +419,37 @@ function displayContentArea(display)
         $("#content-area").css("display", "block")
     else
         $("#content-area").css("display", "none")
+}
+
+function loadRecommendations()
+{
+    console.log("loading Recommendations")
+    var lists = ["eat", "see", "do"];
+    var trailItems = [];
+    $.getJSON(JSON_READ,
+            function(data) {
+                $.each(data, function(i, item) {
+                    for (var j in lists)
+                    {
+
+                        var category = lists[j];
+                        console.log(category);
+
+                        var trailItem = createTrailItemFromJSON(item);
+                        if ($.inArray(category, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
+                            trailItems.push(trailItem);
+                            console.log("\t" + category + "\t" + trailItem.title);
+                            addRecommendationItem(trailItem, category);
+                        }
+                    }
+                });
+            });
+}
+
+function addRecommendationItem(trailItem, category)
+{
+    var list = "#" + category + "_list ol";
+    console.log(list);
+    var str = "<li>" + trailItem.parseTrailItemLink() + "</br>" + getNiceTime(trailItem.date) + "</li>";
+    $(list).append(str);
 }
