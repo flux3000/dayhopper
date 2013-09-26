@@ -75,7 +75,14 @@ input[type=submit]{
 }
 
 #trail-grid li{
-    display:block;
+
+
+
+    font-size: large;
+    display: table-cell; 
+    vertical-align: middle; 
+    text-align: center; 
+line-height: 80px;
     float:left;
     margin:10px;
     width:200px;
@@ -195,6 +202,11 @@ input[type=submit]{
     background-color:#DEEBF7;
     border:1px solid #4472C4;
 }
+.recommended-list li p{
+    color:#a2a2a2;
+    overflow: hidden;
+    height: 20px;
+}
 
 .trail-item{
     height: 60spx;
@@ -233,20 +245,45 @@ input[type=submit]{
     display:block;
     float:left;
 
-    background-color: #DEEBF7;
+    background-color: #5B9BD5;
     margin-right:5px;
     padding:5px;
     font-size: small;
     z-index:2;
 }
+.trail-item-menu{
+    color:#5B9BD5;
+    float:right;
+    display:block;
+    z-index: 10;
+    position:relative;
+    text-align:right;
+    margin-right:-10px;
+    opacity:.1;
+}
+.trail-item-menu:hover{
+    opacity:1;
+}
+.trail-item-menu li{
+    padding:5px;
+    font-size: large;
+}
+.trail-item-menu li:hover{
+    color:white;
+    background-color: #4472C4;
 
+}
+.trail-item-link{
+
+}
 .trail-item-order{
 
     z-index: 1;
     position:absolute;
     text-align: center;
     font-size: 80pt;
-    width:340px;
+    width:360px;
+
     opacity:.1;
     color: #4472C4
 }
