@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IO Lab - Memex</title>
+    
+    <!-- link to css file -->
+    <link rel="stylesheet" type="text/css" href="_css/style.css" />
+    <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    <!-- link to javascript files -->
+    <script src="_js/jquery-1.10.2.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="_js/script.js"></script>    
+    <script type="text/javascript">
+
+        /*
+        * addLink
+        *
+        * url:  The new URL to add to the path
+        * pathTag: The master tag for this path (also found in the Dummy)
+        *
+        * Checks the length of the path and adds new link to the end.
+        */
+
+        function addLink(url, pathTag) {
+
+            $.getJSON("http://feeds.delicious.com/v2/json/dantsai/"+pathTag+"?callback=?",
+            {},
+                function(data){
+                    // next is the next Step # for this Path
+                    var next = data.length;
+
+                    $.ajax({
+                    type: "POST",
+                    url: "delicious_proxy.php",
+                    data: { username: "dantsai", password: "npoc3opDL", method: "posts/add", url: url, tags: ""+pathTag+","+pathTag+"-step"+next }
+                }).done(function( msg ) {
+                    console.log(msg);
+                });
+            });
+        };
+
+        /*
+        * renameTag
+        *
+        *
+        *
+        * Simple rename of tag, will be useful for re-ordering the steps
+        * Currently not working.  Anyone see why?
+        */
+        function renameTag(old, anew) {
+           $.ajax({
+                type: "POST",
+                url: "delicious_proxy.php",
+                data: { username: "dantsai", password: "npoc3opDL", method: "tags/rename", old: old, new: anew }
+            }).done(function( msg ) {
+                console.log(msg);
+            });
+        }
+
+        $(document).ready(function() {
+
+            var old = "brewpubs-step1";
+            var new = "brewpubs-step0";
+            renameTag(old, new);
+        });
+
+            /*
+
+
+            //$.getJSON("https://dantsai:npoc3opDL@api.delicious.com/v1/tags/rename?callback=?old=mytrail&new=hahaha",
+            $.getJSON("http://feeds.delicious.com/v2/json/dantsai/brewpubs?callback=?",
+            {
+            
+            },
+            function(data){
+                $.each(data, function(i, item){
+                    var title = item.d;
+                    var url = item.u;
+                    var date = item.dt;
+                    var tags = item.t;
+                    $("#delicious-bookmarks").append('<li><a href="'+url+'">'+title+'</a> <i style="color:grey">'+tags+'</i> <time>'+niceTime(date)+'<time></li>');
+                });
+                $(".ajax-loader").css("display","none");
+            });
+
+
+            // test changePosition
+            //var order = ['brewpubs-step2', 'brewpubs-step3', 'brewpubs-step1'];
+            //changePosition(order);
+
+            // test nextLinkNumber
+            //nextLinkNumber("brewpubs");
+
+            // test Add Link
+            addLink("www.beer.com", "brewpubs");
+
+        });
+
+        // order is an ordered array of <tag>-step#        
+        function changePosition(order) {
+            // Getting the root of tag name by stripping the digit from one of 'em
+            subname = order[0].replace(/\d+$/, '');
+
+            $.each(order, function(i, val){
+
+                //alert("old: "+val+" new: "+subname+i);
+
+                $.ajax({
+                    type: "POST",
+                    url: "delicious_proxy.php",
+                    data: { username: "dantsai", password: "npoc3opDL", method: "tags/rename", old: val, new: subname+i }
+                }).done(function( msg ) {
+                    console.log(msg);
+                    //alert( "Reorder done: " + msg );
+                });
+            });
+
+        */
+        
+
+
+
+        var niceTime = (function(){
+            var ints = {
+            second: 1,
+            minute: 60,
+            hour: 3600,
+            day: 86400,
+            week: 604800,
+            month: 2592000,
+            year: 31536000
+            };
+            return function(time){
+            time = +new Date(time);
+            var gap = ((+new Date()) - time) / 1000,
+            amount, measure;
+            for (var i in ints){
+            if (gap > ints[i]){ measure = i; }
+            }
+            amount = gap / ints[measure];
+            amount = gap > ints.day ? (Math.round(amount)) : Math.round(amount);
+            amount += ' ' + measure + (amount > 1 ? 's' : '') + ' ago';
+            return amount;
+            };
+        })();
+
+    </script>
+</head>
+<body>
+    
+    <div id="container">
+
+        <div id="title">
+            This is a Memex.
+        </div>
+
+        <div id="content">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </div>
+        <ul id="delicious-bookmarks"></ul>
+        <div class="ajax-loader">fetching bookmarks...</div>
+
+
+    </div>
+
+</body>
+</html>
