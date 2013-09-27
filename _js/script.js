@@ -2,16 +2,32 @@ $(document).ready(function() {
     init();
 })
 
-
+var JSON_READ = "http://feeds.delicious.com/v2/json/dantsai?count=100&callback=?";
 
 function init() {
+
+    toggleMap();
+    displayUserPromptArea(true);
+    displayContentArea(false);
+    getTrailListFromDelicious(true);
     addTrailItemFromForm();
     updateTrailCountLabel();
     isTrailEmpty();
-    addTest();
-
-
+    loadRecommendations();
 }
+/** toggle the map view between true and false. Default is true
+ * @returns {undefined}
+ */
+function toggleMap()
+{
+    if ($("#map-canvas").css("display") == "none")
+        $("#map-canvas").css("display", "inline-block");
+    else
+        $("#map-canvas").css("display", "none");
+}
+
+
+
 
 function addTest()
 {
@@ -21,98 +37,143 @@ function addTest()
         var link = "https://www.google.com/search?q=" + 1;
         var tags = name + ",tag 1,tag 2";
 
+        var date = new Date();
 
-        addTrailItemText(name, link, tags)
+        var trailItem = createTrailItemFromText(name, link, tags, date)
+        addTrailItemToMemex(trailItem);
 
     }
 
 }
 
-function TrailLink() {
-    this.link = "";
-    this.name = "";
+/*------------------------------------------------|
+ *           TrailItemObject Function             |
+ * ----------------------------------------------*/
+
+/**
+ * Class of a Trail Item
+ * @returns {TrailItem}
+ */
+function TrailItem() {
+    this.url = "";
+    this.title = "";
     this.image = "";
     this.order;
     this.description = "";
     this.delicious_id;
-    this.parseTrailLink = parseTrailLink;
+    this.date;
+    this.parseTrailItemLink = parseTrailItemLink;
     this.tags = {};
-    this.formatTrailListItem = formatTrailListItem;
-
-
+    this.formatTrailItemHTML = formatTrailItemHTML;
 }
 
-function parseTrailLink()
-{
+/**
+ * create HTML link for TailItem URL
+ * @returns {String}
+ */
+function parseTrailItemLink() {
     var url = "";
-    url += "<a href='" + this.link + "'>" + this.name + "</a>"
-
+    url += "<a href='" + this.url + "' target='_blank'>" + this.title + "</a>"
     return url;
 }
 
-function formatTrailListItem()
-{
-    var item = "<li><div class='trail-link'>";
-    item += "<img src='" + this.image + "' alt='IMAGE'/>";
-    item += this.parseTrailLink();
-    item += "</br><p>" + this.description + "</p>";
-    item += "</br><ul class='trail-link-tags'>";
-
+/**
+ * generate HTML format for a Mememx list item
+ * @returns {String}
+ */
+function formatTrailItemHTML() {
+    var item = "<li><div class='trail-item'>";
+    /*
+     item += "<img src='" + this.image + "' alt='IMAGE'/>";
+     */
+    
+    item += "<div class='trail-item-menu'><ul>";
+    item += "<li class='trail-item-edit'>&#9998;</li>";
+    item += "<li class='trail-item-delete'>&#9587;</li>";
+    item += "<li class='trail-item-up'>&#9650;</li>";
+    item += "<li class='trail-item-down'>&#9660;</li>";
+    item += "</ul></div>";
+    item += "<div class='trail-item-order' value='" + this.order + "'>" + this.order + "</div>";
+    item += "<div class='trail-item-link'>"+this.parseTrailItemLink()+"</div>";
+    item += "</br><p>" + getNiceTime(this.date) + "</p>";
+    item += "</br><ul class='trail-item-tags'>";
     for (var i = 0; i < this.tags.length; i++)
     {
         item += "<li>" + this.tags[i] + "</li>";
-
     }
     item += "</ul>";
-    item += "</div><hr></li>";
+
+    item += "</div></li>";
     return item;
 }
 
-function addTrailItemText(name, link, tags)
+function createTrailItemFromJSON(item)
 {
-    var trailLink = new TrailLink();
-    trailLink.name = name;
-    trailLink.link = link;
-    trailLink.tags = tags.split(",");
-    trailLink.tags.push(name);
+    var trailItem = new TrailItem();
 
-
-
-    addTrailItemToMemex(trailLink);
+    trailItem.title = item.d;
+    trailItem.url = item.u;
+    trailItem.date = item.dt;
+    trailItem.tags = item.t;
+    return trailItem;
 }
 
+/**
+ * Create a new TrailItem from text
+ * @param {String} title
+ * @param {String} link
+ * @param {Array of Strings} tags
+ * @param {Date} date
+ * @returns {createTrailItemFromText.trailItem|TrailItem}
+ */
+function createTrailItemFromText(title, url, tags, date) {
+    var trailItem = new TrailItem();
+    trailItem.title = title;
+    trailItem.url = url;
+    trailItem.tags = tags.split(",");
+    if (typeof date === 'undefined')
+        trailItem.date = new Date();
+    else
+        trailItem.date = date;
+    trailItem.tags.push(name);
 
+    return trailItem;
+}
+
+/*------------------------------------------------|
+ *                  ACTIONS                       |
+ * ----------------------------------------------*/
+/**
+ * TODO
+ * @returns {undefined}
+ */
 function addTrailItemFromForm()
 {
     $("#submit_button").click(function() {
 
-        var trailLink = new TrailLink();
-        trailLink.name = $("#memex-form-name").val()
-        trailLink.link = $("#memex-form-link").val();
-        trailLink.tags = $("#memex-form-memex").split(",");
-        trailLink.tags.push(trailLink.name);
-
-        addTrailItemToMemex(trailLink);
-
+        var trailItem = new TrailItem();
+        trailItem.title = $("#memex-form-name").val()
+        trailItem.url = $("#memex-form-link").val();
+        trailItem.tags = $("#memex-form-memex").split(",");
+        trailItem.tags.push(trailItem.title);
+        trailLInk.date = new Date();
+        addTrailItemToMemex(trailItem);
     });
 }
 
-function addTrailItemToMemex(trailLink)
+
+/**
+ * Add a trail item to the Memex
+ * @param {TrailItem} trailItem
+ * @returns {Boolean}
+ */
+function addTrailItemToMemex(trailItem)
 {
-
-    trailLink.order = getTrailSize() + 1;
-
-    var listEl = $(trailLink.formatTrailListItem());
-    
-            /*listEl.hide();*/
-            $("#memex-list ol").append(listEl);
+    trailItem.order = getTrailSize() + 1;
+    var listEl = $(trailItem.formatTrailItemHTML());
+    /*listEl.hide();*/
+    $("#memex-list ol").append(listEl);
     $("#empty-memex-list").css("display", "none");
-    /*
-     $.post($("#form").attr("action"), $("#form").serialize(), function(html) {
-     $("div.result").html(html);
-     */
-    $("#memex-list ol li:last").hide();
-    listEl.fadeIn();
     /*removeItem();*/
     updateTrailCountLabel();
     return false;
@@ -133,8 +194,7 @@ function addTrailItemToMemex(trailLink)
  });
  }
  */
-function isTrailEmpty()
-{
+function isTrailEmpty() {
 
     var size = $("#memex-list ol").children("li").length;
 
@@ -146,17 +206,193 @@ function isTrailEmpty()
     $("#empty-memex-list").css("display", "none");
     return false;
 }
-function getTrailSize()
-{
+function getTrailSize() {
     return $("#memex-list ol").children("li").length;
 }
-function updateTrailCountLabel()
-{
+
+/**
+ * Update the count label in the page title
+ * @returns {undefined}
+ */
+function updateTrailCountLabel() {
     var size = getTrailSize();
     var txt = "";
     if (size > 0) {
         txt = "(" + size + ")";
     }
-
     $("#count-label").text(txt);
+}
+/**
+ * Load the list of Trails from dummy link
+ * @param {boolean} updateHTML if true insert the trail to the trai-grid
+ * @returns {undefined}
+ */
+function getTrailListFromDelicious(updateHTML) {
+    var trails = [];
+    $.getJSON(JSON_READ,
+            function(data) {
+                $.each(data, function(i, item) {
+                    console.log("Data fetched");
+                    var tags = item.t;
+
+                    if ($.inArray("Dummy", tags) > -1) {
+                        $.each(tags, function(index, value) {
+                            if (value != "Dummy") {
+                                trails.push(value);
+                            }
+                        });
+                    }
+                });
+                if (updateHTML)
+                {
+                    for (var trail in trails)
+                    {
+                        var str = "<li>" + trails[trail] + "</li>";
+                        $("#trail-grid").append(str);
+                    }
+                    addEventLoadTrailItemsByTrail();
+                }
+                return trails;
+            });
+}
+
+function getTrailItemsFromDelicious(trailName, updateHTML)
+{
+    var trailItems = [];
+
+    $.getJSON(JSON_READ,
+            function(data) {
+
+                $.each(data, function(i, item) {
+                    var trailItem = createTrailItemFromJSON(item);
+                    if ($.inArray(trailName, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
+                        trailItems.push(trailItem);
+                    }
+                });
+                trailItems = sortTrailItems(trailItems, trailName);
+                if (updateHTML)
+                {
+                    for (var i in trailItems)
+                        addTrailItemToMemex(trailItems[i]);
+                }
+                $(".ajax-loader").css("display", "none");
+                return trailItems;
+            });
+    return trailItems;
+}
+
+function sortTrailItems(trailItems, trailName) {
+
+    var newTrailItems = [];
+    var i = 0;
+    for (var i = 1; i <= trailItems.length; i++)
+    {
+        for (var ti in trailItems)
+        {
+            var trailItem = trailItems[ti];
+            var index = $.inArray(trailName + "-step" + (i), trailItem.tags)
+            /* console.log(i + "\t" + ti + "\t" + index + "\t" + trailItem.tags);*/
+            if (index > -1)
+            {
+                /* console.log("Order found:" + trailItem.tags);*/
+                trailItem.order = index;
+                newTrailItems.push(trailItem);
+                break;
+            }
+        }
+    }
+    return newTrailItems;
+}
+/**
+ * gerenate a nice format for the time
+ * @param {type} time
+ * @returns {Number|getNiceTime.gap|Date}
+ */
+function getNiceTime(time)
+{
+    var ints = {
+        second: 1,
+        minute: 60,
+        hour: 3600,
+        day: 86400,
+        week: 604800,
+        month: 2592000,
+        year: 31536000
+    };
+
+    time = +new Date(time);
+    var gap = ((+new Date()) - time) / 1000,
+            amount, measure;
+    for (var i in ints) {
+        if (gap > ints[i]) {
+            measure = i;
+        }
+    }
+    amount = gap / ints[measure];
+    amount = gap > ints.day ? (Math.round(amount)) : Math.round(amount);
+    amount += ' ' + measure + (amount > 1 ? 's' : '') + ' ago';
+    return amount;
+
+}
+
+function addEventLoadTrailItemsByTrail()
+{
+    console.log("Adding event");
+    $("#trail-grid li").click(function() {
+        var selectedTrail = $(this).text();
+        console.log("Selected Trail=" + selectedTrail);
+        displayContentArea(true);
+        displayUserPromptArea(false);
+        $("#memex-trail-name").text(selectedTrail);
+        getTrailItemsFromDelicious(selectedTrail, true);
+    });
+}
+
+function displayUserPromptArea(display)
+{
+    if (display)
+        $("#user-prompt-area").css("display", "block")
+    else
+        $("#user-prompt-area").css("display", "none")
+}
+
+function displayContentArea(display)
+{
+    if (display)
+        $("#content-area").css("display", "block")
+    else
+        $("#content-area").css("display", "none")
+}
+
+function loadRecommendations()
+{
+    console.log("loading Recommendations")
+    var lists = ["eat", "see", "do"];
+    var trailItems = [];
+    $.getJSON(JSON_READ,
+            function(data) {
+                $.each(data, function(i, item) {
+                    for (var j in lists)
+                    {
+
+                        var category = lists[j];
+                        console.log(category);
+
+                        var trailItem = createTrailItemFromJSON(item);
+                        if ($.inArray(category, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
+                            trailItems.push(trailItem);
+                            console.log("\t" + category + "\t" + trailItem.title);
+                            addRecommendationItem(trailItem, category);
+                        }
+                    }
+                });
+            });
+}
+
+function addRecommendationItem(trailItem, category)
+{
+    var list = "#" + category + "_list ol";
+    console.log(list);
+    var str = "<li>" + trailItem.parseTrailItemLink() + "</br><p>" + getNiceTime(trailItem.date) + "</p></li>";
+    $(list).append(str);
 }
