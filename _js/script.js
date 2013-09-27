@@ -3,7 +3,12 @@ $(document).ready(function() {
 })
 
 var JSON_READ = "http://feeds.delicious.com/v2/json/dantsai?count=100&callback=?";
+//var IMG_LOAD_URL = "http://immediatenet.com/t/m?";
+//var IMG_LOAD_URL = "http://wimg.ca/";
+//var IMG_LOAD_URL = "http://images.shrinktheweb.com/xino.php?stwembed=1&stwaccesskeyid=f736918c57d9420&"
+var IMG_LOAD_URL="http://api.thumbalizr.com/?url=";
 
+var IMG_SIZE = "sm";
 function init() {
 
     toggleMap();
@@ -83,10 +88,11 @@ function parseTrailItemLink() {
  */
 function formatTrailItemHTML() {
     var item = "<li><div class='trail-item'>";
-    /*
-     item += "<img src='" + this.image + "' alt='IMAGE'/>";
-     */
-    
+
+//    item += "<img src='" + this.image + "' alt='IMAGE'/>";
+//    item += "<script type='text/javascript' src='" + this.image + "' ></script>";
+
+
     item += "<div class='trail-item-menu'><ul>";
     item += "<li class='trail-item-edit'>&#9998;</li>";
     item += "<li class='trail-item-delete'>&#9587;</li>";
@@ -94,7 +100,7 @@ function formatTrailItemHTML() {
     item += "<li class='trail-item-down'>&#9660;</li>";
     item += "</ul></div>";
     item += "<div class='trail-item-order' value='" + this.order + "'>" + this.order + "</div>";
-    item += "<div class='trail-item-link'>"+this.parseTrailItemLink()+"</div>";
+    item += "<div class='trail-item-link'>" + this.parseTrailItemLink() + "</div>";
     item += "</br><p>" + getNiceTime(this.date) + "</p>";
     item += "</br><ul class='trail-item-tags'>";
     for (var i = 0; i < this.tags.length; i++)
@@ -109,13 +115,16 @@ function formatTrailItemHTML() {
 
 function createTrailItemFromJSON(item)
 {
-    var trailItem = new TrailItem();
-
-    trailItem.title = item.d;
-    trailItem.url = item.u;
-    trailItem.date = item.dt;
-    trailItem.tags = item.t;
-    return trailItem;
+    return createTrailItemFromText(item.d, item.u, "" + item.t, item.dt);
+    /*
+     var trailItem = new TrailItem();
+     
+     trailItem.title = item.d;
+     trailItem.url = item.u;
+     trailItem.tags = item.t;
+     trailItem.date = item.dt;
+     return trailItem;
+     */
 }
 
 /**
@@ -135,8 +144,8 @@ function createTrailItemFromText(title, url, tags, date) {
         trailItem.date = new Date();
     else
         trailItem.date = date;
-    trailItem.tags.push(name);
-
+//    trailItem.tags.push(title);
+    trailItem.image = loadURLImage(url, IMG_SIZE)
     return trailItem;
 }
 
@@ -396,3 +405,12 @@ function addRecommendationItem(trailItem, category)
     var str = "<li>" + trailItem.parseTrailItemLink() + "</br><p>" + getNiceTime(trailItem.date) + "</p></li>";
     $(list).append(str);
 }
+
+function loadURLImage(url, size)
+{
+//    return IMG_LOAD_URL + "Size=" + size + "&URL=" + url;
+//   return IMG_LOAD_URL + "stwsize=" + size + "&stwurl=" + url;
+return IMG_LOAD_URL+url;
+
+}
+

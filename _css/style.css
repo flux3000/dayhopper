@@ -236,6 +236,11 @@ line-height: 80px;
     height: 20px;
 }
 
+.trail-item img{
+    z-index: 200;
+    background-color: red;
+}
+
 .trail-item-tags{
 
     display: inline-block;
@@ -245,11 +250,14 @@ line-height: 80px;
     display:block;
     float:left;
 
-    background-color: #5B9BD5;
+    background-color: #DEEBF7;
     margin-right:5px;
     padding:5px;
     font-size: small;
     z-index:2;
+}
+.trail-item-tags li:hover{
+    background-color: #5B9BD5;
 }
 .trail-item-menu{
     color:#5B9BD5;
