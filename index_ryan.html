@@ -3,63 +3,162 @@
 <head>
     <title>IO Lab - Memex</title>
     
-    <!-- link to css file -->
-    <link rel="stylesheet" type="text/css" href="_css/style.css" />
+    <!-- link to css file 
+    <link rel="stylesheet" type="text/css" href="_css/style.css" />-->
     <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            background-color: #333;
+        }
+
+        #title {
+                font-size: 24pt;
+                font-weight: bold;
+                padding: 12px;
+        } 
+
+        #trailTitle {
+                font-size: 16pt;
+                font-weight: bold;
+                padding: 12px;
+        }
+
+
+        #container {
+                margin: 40px auto;
+                overflow: hidden;
+                padding: 12px;
+                width: 1000px;
+                background-color: #FFF;
+                border: 1px solid #999;
+                border-radius: 8px;
+                box-shadow: 3px 3px 2px #222;
+        }
+
+        #content {
+            overflow: auto;
+            padding: 12px;
+        }
+
+        #left-col {
+            float: left;
+            width: 300px;
+            padding: 0px 10px;
+        }
+        #right-col {
+            float: left;
+            width: 500px;
+            padding: 0px 10px;
+        }
+
+
+    </style>
     <!-- link to javascript files -->
-    <script src="_js/jquery-1.10.2.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <!--<script src="_js/jquery-1.10.2.min.js"></script>-->
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
     <script>
+
+        var hopData = []; // contains all the data from all the delicious links, except for the dummy link.
+        var trailList = []; // contains names of each of the trails, as listed in the dummy link.
+
         $(document).ready(function() {
-            $.getJSON("http://feeds.delicious.com/v2/json/dantsai?callback=?",
-            function(data){
+
+            $("#hopTrails").on('mouseenter', 'li.trail', function() {
+                $(this).css("cursor", "pointer");   
+            })
+
+            $.getJSON("http://feeds.delicious.com/v2/json/dantsai?count=100&callback=?", function(data) {
+
+                // initialize a counter
+                var linkCount = 0;
+
+                // go through each item in the delicious JSON and create hopData and trailList arrays.
                 $.each(data, function(i, item){
                     var title = item.d;
                     var url = item.u;
                     var date = item.dt;
                     var tags = item.t;
 
+                    // Find the dummy bookmark; Pull user-created trails, create the html for the list and add each one to the trailList array.
                     if ($.inArray("Dummy", tags) > -1) {
                         $.each(tags, function(index, value) {
                             if (value != "Dummy"){
-                                $("#hop-trails").append('<li>'+value+'</li>');
+                                $("#hopTrails").append('<li class="trail" id="'+value+'">'+value+'</li>');
+                                trailList.push(value);
                             }
                         });
-                    } else {
-                        $("#delicious-bookmarks").append('<li><a href="'+url+'">'+title+'</a> <time>'+niceTime(date)+'</time><br/>'+tags+'</li>');
+                    } else { // Add this link and its data (title, url, tag array) to the main hopData array.
+                        
+                        var subArray = [linkCount,title,url,tags];
+                        hopData.push(subArray);
+                        linkCount++;
+
+                        //$("#delicious-bookmarks").append('<li><a href="'+url+'">'+title+'</a><br/>'+tags+'</li>');
                     }
                 });
+                
                 $(".ajax-loader").css("display","none");
+
+                //console.log("HOPDATA: " + hopData);
+                //console.log("TRAILLIST: " + trailList);
+
             });
+      
+            // When a user clicks a trail name, generate a list of the steps in the trail, in order.
+            $("#hopTrails").on('click', 'li.trail', function() {
+
+                // Empty the existing list
+                $("#thisTrail").empty();
+
+                // Array containing the links in thisTrail, in order.
+                var trailItems = []; 
+
+                // thisTrail is the name of the trail that the user just clicked on.
+                var thisTrail = $(this).attr("id");
+
+                // update the trail list header.
+                $("#trailTitle").text("Here is the path for the " + thisTrail + " trail");
+
+                //console.log("SEARCHING LINKS FOR THIS TAG: " + thisTrail);
+
+                // go through hopData and find links that contain the tag that indicates it's part of the desired path. 
+                for(i=0;i<hopData.length;i++) {
+
+                    var linkTags = hopData[i][3];
+
+                    // check if our desired trailname is contained in this link's tags
+                    if ($.inArray(thisTrail, hopData[i][3]) > -1) { 
+                        
+                        // extract the step number from the tag.
+                        $.each(linkTags, function(index, value) {
+                            var tag_split = value.split("step");        
+                            var this_step = parseInt(tag_split[1]);
+
+                            if (!isNaN(this_step)) {
+
+                                // add the step to trailItems, at the proper index according to its step number.
+                                trailItems[this_step-1] = ["Step "+this_step, hopData[i][1], hopData[i][2]]; // [Step #, url, title]
+                            }
+                        });
+                                                
+                    }
+
+                }
+
+                // finally, read through trailItems and construct the HTML.
+                for (j=0;j<trailItems.length;j++) {
+                    var myStep = trailItems[j][0];
+                    var myTitle = trailItems[j][1];
+                    var myURL = trailItems[j][2];
+
+                    $("#thisTrail").append('<li id="trailItem">' + myStep + ' - <a href="' + myURL + '">' + myTitle + '</a></li>');
+                }
+                return false;                
+            });           
         });
-
-        var niceTime = (function(){
-            var ints = {
-            second: 1,
-            minute: 60,
-            hour: 3600,
-            day: 86400,
-            week: 604800,
-            month: 2592000,
-            year: 31536000
-            };
-            return function(time){
-            time = +new Date(time);
-            var gap = ((+new Date()) - time) / 1000,
-            amount, measure;
-            for (var i in ints){
-            if (gap > ints[i]){ measure = i; }
-            }
-            amount = gap / ints[measure];
-            amount = gap > ints.day ? (Math.round(amount)) : Math.round(amount);
-            amount += ' ' + measure + (amount > 1 ? 's' : '') + ' ago';
-            return amount;
-            };
-        })();
-
     </script>
-
-
 
 </head>
 <body>
@@ -67,20 +166,27 @@
     <div id="container">
 
         <div id="title">
-            This is a Memex.
+            This is The Hop Trail.
         </div>
 
         <div id="content">
-            Here are our bookmarks for SF Hops
+            <div id="left-col">
+                <h3>Hop Trails</h3>
+                <ul id="hopTrails">
+                <li class="trail" id="blah">Test</li>
+                </ul>
+            </div>
+            <div id="right-col">
+                <div id="trailTitle"></div>
+                <ul id="thisTrail">
+                </ul>
+            </div>
+
+
+            <!--<h3>Sites to choose from</h3>
+            <ul id="delicious-bookmarks"></ul>
+            <div class="ajax-loader">fetching bookmarks...</div>-->
         </div>
-
-        <h3>Hop Trails</h3>
-        <ul id="hop-trails"></ul>
-
-        <h3>Sites to choose from</h3>
-        <ul id="delicious-bookmarks"></ul>
-        <div class="ajax-loader">fetching bookmarks...</div>
-
     </div>
 
 </body>
