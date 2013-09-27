@@ -1,13 +1,18 @@
 $(document).ready(function() {
     init();
-})
-
-var JSON_READ = "http://feeds.delicious.com/v2/json/dantsai?count=100&callback=?";
+});
+var JSON_USERNAME = "dantsai";
+var JSON_PASSWORD = "npoc3opDL";
+var JSON_COUNT_SUFFIX = "?count=100&callback=?";
+var JSON_ROOT = "http://feeds.delicious.com/v2/json/dantsai";
+var JSON_DUMMY = JSON_ROOT + "/Dummy" + JSON_COUNT_SUFFIX;
+var JSON_READ = JSON_ROOT + JSON_COUNT_SUFFIX;
+var JSON_EDIT = JSON_ROOT + "/";
+var RESULT_ITEM_EXIST_MSG = "item already exists";
 //var IMG_LOAD_URL = "http://immediatenet.com/t/m?";
 //var IMG_LOAD_URL = "http://wimg.ca/";
 //var IMG_LOAD_URL = "http://images.shrinktheweb.com/xino.php?stwembed=1&stwaccesskeyid=f736918c57d9420&"
-var IMG_LOAD_URL="http://api.thumbalizr.com/?url=";
-
+var IMG_LOAD_URL = "http://api.thumbalizr.com/?url=";
 var IMG_SIZE = "sm";
 function init() {
 
@@ -33,24 +38,24 @@ function toggleMap()
 
 
 
-
-function addTest()
-{
-    for (var i = 1; i <= 10; i++)
-    {
-        var name = "Test " + i;
-        var link = "https://www.google.com/search?q=" + 1;
-        var tags = name + ",tag 1,tag 2";
-
-        var date = new Date();
-
-        var trailItem = createTrailItemFromText(name, link, tags, date)
-        addTrailItemToMemex(trailItem);
-
-    }
-
-}
-
+/*
+ function addTest()
+ {
+ for (var i = 1; i <= 10; i++)
+ {
+ var name = "Test " + i;
+ var link = "https://www.google.com/search?q=" + 1;
+ var tags = name + ",tag 1,tag 2";
+ 
+ var date = new Date();
+ 
+ var trailItem = createTrailItemFromText(name, link, tags, date)
+ addTrailItemToMemex(trailItem);
+ 
+ }
+ 
+ }
+ */
 /*------------------------------------------------|
  *           TrailItemObject Function             |
  * ----------------------------------------------*/
@@ -70,6 +75,7 @@ function TrailItem() {
     this.parseTrailItemLink = parseTrailItemLink;
     this.tags = {};
     this.formatTrailItemHTML = formatTrailItemHTML;
+    this.trailName = "";
 }
 
 /**
@@ -88,7 +94,6 @@ function parseTrailItemLink() {
  */
 function formatTrailItemHTML() {
     var item = "<li><div class='trail-item'>";
-
 //    item += "<img src='" + this.image + "' alt='IMAGE'/>";
 //    item += "<script type='text/javascript' src='" + this.image + "' ></script>";
 
@@ -105,26 +110,33 @@ function formatTrailItemHTML() {
     item += "</br><ul class='trail-item-tags'>";
     for (var i = 0; i < this.tags.length; i++)
     {
-        item += "<li>" + this.tags[i] + "</li>";
+        var tag = this.tags[i];
+//        console.log(this.trailName + "..\t" + tag);
+
+        var isTag = tag === this.trailName;
+        var isStep;
+        try {
+            isStep = (this.trailName + "-step") === tag.substring(0, this.trailName.length + 5);
+        } catch (err)
+        {
+            console.log(err);
+            isStep = false;
+        }
+//        console.log("Stripped tag\t" + tag.substring(0, this.trailName.length + 5));
+        if (!isTag && !isStep)
+            item += "<li>" + tag + "</li>";
     }
     item += "</ul>";
-
     item += "</div></li>";
     return item;
 }
-
+function getTrailNameFromForm()
+{
+    return $("#memex-trail-name").text();
+}
 function createTrailItemFromJSON(item)
 {
-    return createTrailItemFromText(item.d, item.u, "" + item.t, item.dt);
-    /*
-     var trailItem = new TrailItem();
-     
-     trailItem.title = item.d;
-     trailItem.url = item.u;
-     trailItem.tags = item.t;
-     trailItem.date = item.dt;
-     return trailItem;
-     */
+    return createTrailItemFromText(item.d, item.u, "" + item.t, item.dt, getTrailNameFromForm());
 }
 
 /**
@@ -135,11 +147,13 @@ function createTrailItemFromJSON(item)
  * @param {Date} date
  * @returns {createTrailItemFromText.trailItem|TrailItem}
  */
-function createTrailItemFromText(title, url, tags, date) {
+function createTrailItemFromText(title, url, tags, date, trailName) {
     var trailItem = new TrailItem();
     trailItem.title = title;
     trailItem.url = url;
     trailItem.tags = tags.split(",");
+    if (!(typeof trailName === 'undefined'))
+        trailItem.trailName = trailName;
     if (typeof date === 'undefined')
         trailItem.date = new Date();
     else
@@ -159,15 +173,61 @@ function createTrailItemFromText(title, url, tags, date) {
 function addTrailItemFromForm()
 {
     $("#submit_button").click(function() {
+        try {
+            var trailName = getTrailNameFromForm();
+            var trailItem = new TrailItem();
+//            trailItem.title = $("#memex-trail-name").text();
+            trailItem.url = $("#memex-form-link").val();
+            trailItem.tags = $("#memex-form-tags").val().split(",");
+            trailItem.tags.push(trailName);
+            trailItem.date = new Date();
+            trailItem.trailName = trailName;
+            addTrailItemToMemex(trailItem);
+//            console.log("submit clicked");
+//            var url = $("#memex-form-link").text();
 
-        var trailItem = new TrailItem();
-        trailItem.title = $("#memex-form-name").val()
-        trailItem.url = $("#memex-form-link").val();
-        trailItem.tags = $("#memex-form-memex").split(",");
-        trailItem.tags.push(trailItem.title);
-        trailLInk.date = new Date();
-        addTrailItemToMemex(trailItem);
+//            console.log(trailName + "\t" + trailItem.url + "\n" + trailItem.tags);
+            addLink(trailItem.url, trailName, trailItem.tags);
+            return false;
+        } catch (err) {
+
+            console.log("ERROR ----------------\n\n\n" + err);
+            return false;
+        }
+
     });
+}
+
+
+function addLink(url, trailName, tags) {
+//    console.log("Adding link");
+    $.getJSON(JSON_EDIT + trailName + "?callback=?",
+            {},
+            function(data) {
+                // next is the next Step # for this Path
+                var next = data.length;
+                var trailNameStep = trailName + "-step" + next;
+                $.ajax({
+                    type: "POST",
+                    url: "delicious_proxy.php",
+                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, tags: trailNameStep + "," + tags}
+                }).done(function(msg) {
+                    console.log("DONE");
+                    console.log(msg);
+                    var result_code = msg.result_code;
+                    console.log("RESULT:" + result_code);
+                    if (result_code === RESULT_ITEM_EXIST_MSG)
+                    {
+                        alert(RESULT_ITEM_EXIST_MSG);
+                    }
+                    if (result_code === "done")
+                    {
+                        getTrailItemsFromDelicious(trailNameStep, true);
+                    }
+
+
+                });
+            });
 }
 
 
@@ -186,7 +246,6 @@ function addTrailItemToMemex(trailItem)
     /*removeItem();*/
     updateTrailCountLabel();
     return false;
-
 }
 
 /*
@@ -206,7 +265,6 @@ function addTrailItemToMemex(trailItem)
 function isTrailEmpty() {
 
     var size = $("#memex-list ol").children("li").length;
-
     if (size === 0)
     {
         $("#empty-memex-list").css("display", "block");
@@ -238,19 +296,18 @@ function updateTrailCountLabel() {
  */
 function getTrailListFromDelicious(updateHTML) {
     var trails = [];
-    $.getJSON(JSON_READ,
+    $.getJSON(JSON_DUMMY,
             function(data) {
                 $.each(data, function(i, item) {
-                    console.log("Data fetched");
+//                    console.log("Data fetched");
                     var tags = item.t;
-
-                    if ($.inArray("Dummy", tags) > -1) {
-                        $.each(tags, function(index, value) {
-                            if (value != "Dummy") {
-                                trails.push(value);
-                            }
-                        });
-                    }
+//                    if ($.inArray("Dummy", tags) > -1) {
+                    $.each(tags, function(index, value) {
+                        if (value != "Dummy") {
+                            trails.push(value);
+                        }
+                    });
+//                    } 
                 });
                 if (updateHTML)
                 {
@@ -265,20 +322,19 @@ function getTrailListFromDelicious(updateHTML) {
             });
 }
 
-function getTrailItemsFromDelicious(trailName, updateHTML)
+function getTrailItemsFromDelicious(tag, updateHTML)
 {
     var trailItems = [];
-
     $.getJSON(JSON_READ,
             function(data) {
 
                 $.each(data, function(i, item) {
                     var trailItem = createTrailItemFromJSON(item);
-                    if ($.inArray(trailName, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
+                    if ($.inArray(tag, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
                         trailItems.push(trailItem);
                     }
                 });
-                trailItems = sortTrailItems(trailItems, trailName);
+                trailItems = sortTrailItems(trailItems, tag);
                 if (updateHTML)
                 {
                     for (var i in trailItems)
@@ -289,7 +345,33 @@ function getTrailItemsFromDelicious(trailName, updateHTML)
             });
     return trailItems;
 }
-
+/*
+ function getTrailItemFromDeliciousByTag(tag, updateHTML)
+ {
+ var trailItems = [];
+ 
+ $.getJSON(JSON_ROOT+"/"+tag+JSON_COUNT_SUFFIX,
+ function(data) {
+ 
+ $.each(data, function(i, item) {
+ var trailItem = createTrailItemFromJSON(item);
+ if ($.inArray(trailName, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
+ trailItems.push(trailItem);
+ }
+ });
+ trailItems = sortTrailItems(trailItems, trailName);
+ if (updateHTML)
+ {
+ for (var i in trailItems)
+ addTrailItemToMemex(trailItems[i]);
+ }
+ $(".ajax-loader").css("display", "none");
+ return trailItems;
+ });
+ return trailItems;
+ }
+ 
+ */
 function sortTrailItems(trailItems, trailName) {
 
     var newTrailItems = [];
@@ -299,7 +381,7 @@ function sortTrailItems(trailItems, trailName) {
         for (var ti in trailItems)
         {
             var trailItem = trailItems[ti];
-            var index = $.inArray(trailName + "-step" + (i), trailItem.tags)
+            var index = $.inArray(trailName + "-step" + (i), trailItem.tags);
             /* console.log(i + "\t" + ti + "\t" + index + "\t" + trailItem.tags);*/
             if (index > -1)
             {
@@ -328,7 +410,6 @@ function getNiceTime(time)
         month: 2592000,
         year: 31536000
     };
-
     time = +new Date(time);
     var gap = ((+new Date()) - time) / 1000,
             amount, measure;
@@ -341,15 +422,14 @@ function getNiceTime(time)
     amount = gap > ints.day ? (Math.round(amount)) : Math.round(amount);
     amount += ' ' + measure + (amount > 1 ? 's' : '') + ' ago';
     return amount;
-
 }
 
 function addEventLoadTrailItemsByTrail()
 {
-    console.log("Adding event");
+//    console.log("Adding event");
     $("#trail-grid li").click(function() {
         var selectedTrail = $(this).text();
-        console.log("Selected Trail=" + selectedTrail);
+//        console.log("Selected Trail=" + selectedTrail);
         displayContentArea(true);
         displayUserPromptArea(false);
         $("#memex-trail-name").text(selectedTrail);
@@ -360,22 +440,22 @@ function addEventLoadTrailItemsByTrail()
 function displayUserPromptArea(display)
 {
     if (display)
-        $("#user-prompt-area").css("display", "block")
+        $("#user-prompt-area").css("display", "block");
     else
-        $("#user-prompt-area").css("display", "none")
+        $("#user-prompt-area").css("display", "none");
 }
 
 function displayContentArea(display)
 {
     if (display)
-        $("#content-area").css("display", "block")
+        $("#content-area").css("display", "block");
     else
-        $("#content-area").css("display", "none")
+        $("#content-area").css("display", "none");
 }
 
 function loadRecommendations()
 {
-    console.log("loading Recommendations")
+//    console.log("loading Recommendations")
     var lists = ["eat", "see", "do"];
     var trailItems = [];
     $.getJSON(JSON_READ,
@@ -385,12 +465,12 @@ function loadRecommendations()
                     {
 
                         var category = lists[j];
-                        console.log(category);
+//                        console.log(category);
 
                         var trailItem = createTrailItemFromJSON(item);
-                        if ($.inArray(category, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
+                        if ($.inArray(category, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) === -1) {
                             trailItems.push(trailItem);
-                            console.log("\t" + category + "\t" + trailItem.title);
+//                            console.log("\t" + category + "\t" + trailItem.title);
                             addRecommendationItem(trailItem, category);
                         }
                     }
@@ -401,7 +481,7 @@ function loadRecommendations()
 function addRecommendationItem(trailItem, category)
 {
     var list = "#" + category + "_list ol";
-    console.log(list);
+//    console.log(list);
     var str = "<li>" + trailItem.parseTrailItemLink() + "</br><p>" + getNiceTime(trailItem.date) + "</p></li>";
     $(list).append(str);
 }
@@ -410,7 +490,62 @@ function loadURLImage(url, size)
 {
 //    return IMG_LOAD_URL + "Size=" + size + "&URL=" + url;
 //   return IMG_LOAD_URL + "stwsize=" + size + "&stwurl=" + url;
-return IMG_LOAD_URL+url;
-
+    return IMG_LOAD_URL + url;
 }
 
+
+/* * addLink
+ *
+ * url:  The new URL to add to the path
+ * pathTag: The master tag for this path (also found in the Dummy)
+ *
+ * Checks the length of the path and adds new link to the end.
+ */
+/*
+ function eventAddLink() {
+ 
+ $("#submit_button").click(function() {
+ try {
+ console.log("submit clicked");
+ //            var url = $("#memex-form-link").text();
+ //            var trailName = $("#memex-trail-name").text();
+ //            console.log(trailName + "\t" + url);
+ 
+ //            addLink(url, trailName);
+ return false;
+ } catch (err) {
+ 
+ console.log("ERROR ----------------\n\n\n"+err);
+ return false;
+ }
+ });
+ 
+ }
+ */
+
+
+/*
+ * renameTag
+ *
+ *
+ *
+ * Simple rename of tag, will be useful for re-ordering the steps
+ * Currently not working.  Anyone see why?
+ 
+ function renameTag(old, anew) {
+ $.ajax({
+ type: "POST",
+ url: "delicious_proxy.php",
+ data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
+ }).done(function(msg) {
+ console.log(msg);
+ });
+ }*/
+/*
+ $(document).ready(function() {
+ 
+ var old = "brewpubs-step1";
+ var new = "brewpubs-step0";
+ renameTag(old, new );
+ });
+ */
