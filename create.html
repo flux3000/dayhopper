@@ -46,19 +46,37 @@
                     var index2 = index+1;
                     var tags;
                     // get existing bookmark's tags
-                    var jqxhr = $.get("https://dantsai:npoc3opDL@api.del.icio.us/v1/posts/get?url=" + url, function(data) {
-                        tags = $(data).contents().contents().attr("tag").replace(/ /g,",");
+
+                    var jqxhr = $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                        {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: url}
+                    )
+                    .done (function(data) {
+                        tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
                         // alert("tags before: " + tags);
                         tags = tags + "," + trailname + "," + trailname + "-step" + index2; 
                         // alert("tags after: " + tags);
-                        $.get("https://dantsai:npoc3opDL@api.del.icio.us/v1/posts/add?url=" + url + "&tags=" + tags + "&replace=yes", function(data) {
-                              $("#submitStatus").html("updated!");
+                        $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                            {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
+                        )
+                        .done (function(data) { 
+                            $("#submitStatus").html("updated!");
                         });
+                    })
+                    .fail(function() {
+                        alert("NO");
                     });
-                        // .fail(function() {
-                        //     alert("error");
-                        // });
                 });
+                    
+
+                    // var jqxhr = $.get("https://dantsai:npoc3opDL@api.del.icio.us/v1/posts/get?url=" + url, function(data) {
+                    //     tags = $(data).contents().contents().attr("tag").replace(/ /g,",");
+                    //     // alert("tags before: " + tags);
+                    //     tags = tags + "," + trailname + "," + trailname + "-step" + index2; 
+                    //     // alert("tags after: " + tags);
+                    //     $.get("https://dantsai:npoc3opDL@api.del.icio.us/v1/posts/add?url=" + url + "&tags=" + tags + "&replace=yes", function(data) {
+                    //           $("#submitStatus").html("updated!");
+                    //     });
+                    // });
 
                 // $.getJSON("http://feeds.delicious.com/v2/json/iolab?callback=?", function(data) {
                 //     $.each(data, function(index, bookmark) {
