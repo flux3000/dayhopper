@@ -15,6 +15,9 @@ var RESULT_ITEM_EXIST_MSG = "item already exists";
 var IMG_LOAD_URL = "http://api.thumbalizr.com/?url=";
 var IMG_SIZE = "sm";
 var DUMMYTRAILS;
+
+var currentTrailItems=[];
+
 function init() {
 
     toggleMap();
@@ -39,24 +42,6 @@ function toggleMap()
 
 
 
-/*
- function addTest()
- {
- for (var i = 1; i <= 10; i++)
- {
- var name = "Test " + i;
- var link = "https://www.google.com/search?q=" + 1;
- var tags = name + ",tag 1,tag 2";
- 
- var date = new Date();
- 
- var trailItem = createTrailItemFromText(name, link, tags, date)
- addTrailItemToMemex(trailItem);
- 
- }
- 
- }
- */
 /*------------------------------------------------|
  *           TrailItemObject Function             |
  * ----------------------------------------------*/
@@ -183,12 +168,13 @@ function addTrailItemFromForm()
             trailItem.tags.push(trailName);
             trailItem.date = new Date();
             trailItem.trailName = trailName;
+            addLink(trailItem.url, trailName, trailItem.tags);
+
             addTrailItemToMemex(trailItem);
 //            console.log("submit clicked");
 //            var url = $("#memex-form-link").text();
 
 //            console.log(trailName + "\t" + trailItem.url + "\n" + trailItem.tags);
-            addLink(trailItem.url, trailName, trailItem.tags);
             return false;
         } catch (err) {
 
@@ -211,7 +197,7 @@ function addLink(url, trailName, tags) {
                 $.ajax({
                     type: "POST",
                     url: "delicious_proxy.php",
-                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, tags: trailNameStep + "," + tags}
+                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, tags: trailNameStep + "," + tags, replace: "yes"}
                 }).done(function(msg) {
                     console.log("DONE");
                     console.log(msg);
@@ -232,6 +218,39 @@ function addLink(url, trailName, tags) {
 }
 
 
+function addLink(url, trailName, tags) {
+//    console.log("Adding link");
+    $.getJSON(JSON_EDIT + trailName + "?callback=?",
+            {},
+            function(data) {
+                // next is the next Step # for this Path
+                var next = data.length;
+                var trailNameStep = trailName + "-step" + next;
+                $.ajax({
+                    type: "POST",
+                    url: "delicious_proxy.php",
+                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, tags: trailNameStep + "," + tags, replace: "yes"}
+                }).done(function(msg) {
+                    console.log("DONE");
+                    console.log(msg);
+                    var result_code = msg.result_code;
+                    console.log("RESULT:" + result_code);
+                    if (result_code === RESULT_ITEM_EXIST_MSG)
+                    {
+                        alert(RESULT_ITEM_EXIST_MSG);
+                    }
+                    if (result_code === "done")
+                    {
+                        getTrailItemsFromDelicious(trailNameStep, true);
+                    }
+
+
+                });
+            });
+}
+
+
+
 /**
  * Add a trail item to the Memex
  * @param {TrailItem} trailItem
@@ -240,12 +259,14 @@ function addLink(url, trailName, tags) {
 function addTrailItemToMemex(trailItem)
 {
     trailItem.order = getTrailSize() + 1;
+    currentTrailItems.push(trailItem);
     var listEl = $(trailItem.formatTrailItemHTML());
     /*listEl.hide();*/
     $("#memex-list ol").append(listEl);
     $("#empty-memex-list").css("display", "none");
     /*removeItem();*/
     updateTrailCountLabel();
+    console.log(currentTrailItems);
     return false;
 }
 
@@ -347,6 +368,7 @@ function getTrailItemsFromDelicious(tag, updateHTML)
                     }
                 });
                 trailItems = sortTrailItems(trailItems, tag);
+
                 if (updateHTML)
                 {
                     for (var i in trailItems)
