@@ -4,6 +4,7 @@
     <title>IO Lab - Memex</title>
     
     <!-- link to css file -->
+    <link rel="stylesheet" type="text/css" href="_css/reset.css" />
     <link rel="stylesheet" type="text/css" href="_css/style.css" />
     <style>
         #sortable1, #sortable2 { list-style-type: none; margin: 0; padding: 0 0 2.5em; float: left; margin-right: 10px; width: 320px;}
@@ -38,7 +39,9 @@
                 connectWith: ".connectedSort"
             }).disableSelection();
 
-            $("#createTrail").submit(function() {
+            $("#createTrail").submit(function(event) {
+                //event.preventDefault();
+
                 // iterate through each bookmark in sortable1
                 $("#sortable1").children().each(function(index) {
                     var url = $(this).children().first().attr("href");
@@ -47,7 +50,7 @@
                     var tags;
                     // get existing bookmark's tags
 
-                    var jqxhr = $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                    var jqxhr = $.get("delicious_proxy.php",
                         {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: url}
                     )
                     .done (function(data) {
@@ -55,15 +58,34 @@
                         // alert("tags before: " + tags);
                         tags = tags + "," + trailname + "," + trailname + "-step" + index2; 
                         // alert("tags after: " + tags);
-                        $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                        $.get("delicious_proxy.php",
                             {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
                         )
                         .done (function(data) { 
                             $("#submitStatus").html("updated!");
+
+                            // Also tag the new trail name to the Dummy
+                            var jqxhr = $.get("delicious_proxy.php",
+                                {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: "www.tripadvisor.com"}
+                            )
+                            .done (function(data) {
+                                tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
+                                var tagarr = tags.split(",");
+                                if($.inArray(trailname, tagarr) == -1) {
+                                    tags = tags + "," + trailname; 
+                                    // alert("tags after: " + tags);
+                                    $.get("delicious_proxy.php",
+                                        {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: "www.tripadvisor.com", tags: tags, replace: 'yes'}
+                                    );
+                                }
+                            }); // End update Dummy
+                        })
+                        .fail (function() {
+                            alert("post/add failed");
                         });
                     })
                     .fail(function() {
-                        alert("NO");
+                        alert("post/get failed");
                     });
                 });
                     
@@ -122,27 +144,26 @@
         }
 
 
-            var niceTime = (function(){
+        var niceTime = (function(){
             var ints = {
-            second: 1,
-            minute: 60,
-            hour: 3600,
-            day: 86400,
-            week: 604800,
-            month: 2592000,
-            year: 31536000
+                second: 1,
+                minute: 60,
+                hour: 3600,
+                day: 86400,
+                week: 604800,
+                month: 2592000,
+                year: 31536000
             };
             return function(time){
-            time = +new Date(time);
-            var gap = ((+new Date()) - time) / 1000,
-            amount, measure;
-            for (var i in ints){
-            if (gap > ints[i]){ measure = i; }
-            }
-            amount = gap / ints[measure];
-            amount = gap > ints.day ? (Math.round(amount)) : Math.round(amount);
-            amount += ' ' + measure + (amount > 1 ? 's' : '') + ' ago';
-            return amount;
+                time = +new Date(time);
+                var gap = ((+new Date()) - time) / 1000, amount, measure;
+                for (var i in ints){
+                    if (gap > ints[i]){ measure = i; }
+                }
+                amount = gap / ints[measure];
+                amount = gap > ints.day ? (Math.round(amount)) : Math.round(amount);
+                amount += ' ' + measure + (amount > 1 ? 's' : '') + ' ago';
+                return amount;
             };
         })();
 
@@ -152,27 +173,25 @@
     
     <div id="container">
 
-        <div id="title">
-            This is a Memex.
+        <div id="page-header">
+            <div id="title"><h1><a href="index.html">The Memex</a><label id="count-label" ></label></h1></div>
+
         </div>
 
         <div id="content">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            <ul id="sortable1" class="connectedSort"></ul>
+            <ul id="sortable2" class="connectedSort"></ul>
+
+            <div class="ajax-loader">fetching bookmarks...</div>
+
+            <form id="createTrail" action="">
+                Trail Name: <input id="trailName" type="text">
+                <input id="createTrailButton" type="submit" value="Submit">
+            </form>
+            <div id="submitStatus"></div>
         </div>
 
-        <ul id="sortable1" class="connectedSort">
-        </ul>
-        <ul id="sortable2" class="connectedSort">
-            
-        </ul>
 
-        <div class="ajax-loader">fetching bookmarks...</div>
-
-        <form id="createTrail" action="#">
-            Trail Name: <input id="trailName" type="text">
-            <input id="createTrailButton" type="submit" value="Submit">
-        </form>
-        <div id="submitStatus"></div>
 
     </div>
 

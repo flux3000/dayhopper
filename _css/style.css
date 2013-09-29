@@ -57,9 +57,10 @@ input[type=submit]{
     padding:10px 0px;
     background-color: #44546A;
 }
-#title h1{
+#title h1 a {
     color: #FFC000;
     font-size: xx-large;
+    text-decoration: none;
 
 }
 #user-prompt-area{

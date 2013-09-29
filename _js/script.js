@@ -14,6 +14,7 @@ var RESULT_ITEM_EXIST_MSG = "item already exists";
 //var IMG_LOAD_URL = "http://images.shrinktheweb.com/xino.php?stwembed=1&stwaccesskeyid=f736918c57d9420&"
 var IMG_LOAD_URL = "http://api.thumbalizr.com/?url=";
 var IMG_SIZE = "sm";
+var DUMMYTRAILS;
 function init() {
 
     toggleMap();
@@ -309,6 +310,16 @@ function getTrailListFromDelicious(updateHTML) {
                     });
 //                    } 
                 });
+                // Check if trail exists before sending user to create page
+                $("#create").submit(function(event) {
+                    if($.inArray($("#new-trail-name").val(), trails) > -1) {
+                        // Trail exists.  
+                        // Load the existing trail.
+                        addEventLoadTrailItemsByTrail($("#new-trail-name").val());
+                        // Don't send to create page.
+                        event.preventDefault();
+                    }
+                });
                 if (updateHTML)
                 {
                     for (var trail in trails)
@@ -316,9 +327,10 @@ function getTrailListFromDelicious(updateHTML) {
                         var str = "<li>" + trails[trail] + "</li>";
                         $("#trail-grid").append(str);
                     }
-                    addEventLoadTrailItemsByTrail();
+                    $("#trail-grid li").click(function() {
+                        addEventLoadTrailItemsByTrail($(this).text());
+                    });
                 }
-                return trails;
             });
 }
 
@@ -424,17 +436,16 @@ function getNiceTime(time)
     return amount;
 }
 
-function addEventLoadTrailItemsByTrail()
+function addEventLoadTrailItemsByTrail(selectedTrail)
 {
 //    console.log("Adding event");
-    $("#trail-grid li").click(function() {
-        var selectedTrail = $(this).text();
+    console.log(selectedTrail);
 //        console.log("Selected Trail=" + selectedTrail);
-        displayContentArea(true);
-        displayUserPromptArea(false);
-        $("#memex-trail-name").text(selectedTrail);
-        getTrailItemsFromDelicious(selectedTrail, true);
-    });
+    displayContentArea(true);
+    displayUserPromptArea(false);
+    $("#memex-trail-name").text(selectedTrail);
+    getTrailItemsFromDelicious(selectedTrail, true);
+    return;
 }
 
 function displayUserPromptArea(display)
