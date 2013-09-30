@@ -518,10 +518,7 @@ function eventMoveTrailItemUp()
         $.each(currentTrailItems, function(i, itemk) {
             if(itemk.order >= (trailItem.order -1)) {
                 var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', description: itemk.d, url: itemk.url, tags: itemk.tags.join(","), replace: 'yes'})
-                .done(function() {
-                    alert("yes!");
-                })
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
                 .fail(function() {
                     alert("error");
                 });
@@ -576,10 +573,7 @@ function eventMoveTrailItemDown()
         $.each(currentTrailItems, function(i, itemk) {
             if(itemk.order >= (trailItem.order - 1)) {
                 var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', description: itemk.d, url: itemk.url, tags: itemk.tags.join(","), replace: 'yes'})
-                .done(function() {
-                    alert("yes!");
-                })
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
                 .fail(function() {
                     alert("error");
                 });
@@ -593,11 +587,30 @@ function eventDeleteTrailItem()
     $(".trail-item-delete").click(function() {
         var trailName = getTrailNameFromForm();
         var trailItem = getTrailItemFromHTML(this);
+        var trailItemTags;
         //alert("Attempting to delete item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
 
         $.each(currentTrailItems, function(i, item) {
 
             if (item.order == trailItem.order) {
+                trailItemTags = item.tags;
+                // remove tags from selected item
+                for (var i=trailItemTags.length-1; i>=0; i--) {
+                    if (trailItemTags[i] == trailName + "-step" + trailItem.order) {
+                        trailItemTags.splice(i, 1);
+                    }
+                }
+                for (var i=trailItemTags.length-1; i>=0; i--) {
+                    if (trailItemTags[i] == trailName) {
+                        trailItemTags.splice(i, 1);
+                    }
+                }
+                // remove tags by re-adding without the tags
+                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: item.url, description: item.title, tags: trailItemTags.join(","), replace: 'yes'})
+                .fail(function() {
+                    alert("error");
+                });
 
                 // remove the item from currentTrailItems array
                 currentTrailItems.splice( $.inArray(item, currentTrailItems), 1 );
@@ -632,7 +645,19 @@ function eventDeleteTrailItem()
                 return false;
             }
         });
-        
+
+        // make API call to update all of the trailItems in the trail with new orders.
+        // if we wanted to be more efficient, we would only do an API call for the two that are affected. For now, let's change all of them.
+        $.each(currentTrailItems, function(i, itemk) {
+            if(itemk.order >= (trailItem.order - 1)) {
+                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
+                .fail(function() {
+                    alert("error");
+                });
+            }
+        });
+
 
     });
 }
