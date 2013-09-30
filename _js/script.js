@@ -776,42 +776,87 @@ function loadURLImage(url, size)
     return IMG_LOAD_URL + url;
 }
 
+function addTrail () {
 
-/* * addLink
- *
- * url:  The new URL to add to the path
- * pathTag: The master tag for this path (also found in the Dummy)
- *
- * Checks the length of the path and adds new link to the end.
- */
-/*
- function eventAddLink() {
- 
- $("#submit_button").click(function() {
- try {
- console.log("submit clicked");
- //            var url = $("#memex-form-link").text();
- //            var trailName = $("#memex-trail-name").text();
- //            console.log(trailName + "\t" + url);
- 
- //            addLink(url, trailName);
- return false;
- } catch (err) {
- 
- console.log("ERROR ----------------\n\n\n"+err);
- return false;
- }
- });
- 
- }
- */
+    //$.getJSON("https://dantsai:npoc3opDL@api.delicious.com/v1/tags/rename?callback=?old=mytrail&new=hahaha",
+    $.getJSON("http://feeds.delicious.com/v2/json/dantsai?count=100&callback=?", function(data) {
+        $.each(data, function(i, item){
+            var title = item.d;
+            var url = item.u;
+            var date = item.dt;
+            $("#sortable2").append('<li><a href="'+url+'">'+title+'</a> <time>'+getNiceTime(date)+'<time></li>');
+        });
 
+        $(".ajax-loader").css("display","none");
+    });
 
-/*
- $(document).ready(function() {
- 
- var old = "brewpubs-step1";
- var new = "brewpubs-step0";
- renameTag(old, new );
- });
- */
+    $( "#sortable1, #sortable2" ).sortable({
+        connectWith: ".connectedSort"
+    }).disableSelection();
+
+    $("#createTrail").submit(function(event) {
+        //event.preventDefault();
+
+        // iterate through each bookmark in sortable1
+        $("#sortable1").children().each(function(index) {
+            var url = $(this).children().first().attr("href");
+            var trailname = $("#trailName").val();
+            var index2 = index+1;
+            var tags;
+            // get existing bookmark's tags
+
+            var jqxhr = $.get("delicious_proxy.php",
+                {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: url}
+            )
+            .done (function(data) {
+                tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
+                // alert("tags before: " + tags);
+                tags = tags + "," + trailname + "," + trailname + "-step" + index2; 
+                // alert("tags after: " + tags);
+                $.get("delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
+                )
+                .done (function(data) { 
+                    $("#submitStatus").html("updated!");
+
+                    // Also tag the new trail name to the Dummy
+                    var jqxhr = $.get("delicious_proxy.php",
+                        {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: "www.tripadvisor.com"}
+                    )
+                    .done (function(data) {
+                        tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
+                        var tagarr = tags.split(",");
+                        if($.inArray(trailname, tagarr) == -1) {
+                            tags = tags + "," + trailname; 
+                            // alert("tags after: " + tags);
+                            $.get("delicious_proxy.php",
+                                {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: "www.tripadvisor.com", tags: tags, replace: 'yes'}
+                            );
+                        }
+                    }); // End update Dummy
+                })
+                .fail (function() {
+                    alert("post/add failed");
+                });
+            })
+            .fail(function() {
+                alert("post/get failed");
+            });
+        });
+        event.preventDefault();
+    });
+}
+
+// Read a page's GET URL variables and return them as an associative array.
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
