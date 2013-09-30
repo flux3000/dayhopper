@@ -15,7 +15,7 @@ var RESULT_ITEM_EXIST_MSG = "item already exists";
 var IMG_LOAD_URL = "http://api.thumbalizr.com/?url=";
 var IMG_SIZE = "sm";
 var DUMMYTRAILS;
-var HIDE_META_TAGS=false;
+var HIDE_META_TAGS = true;
 
 var allTrails = [];
 
@@ -132,7 +132,7 @@ function isMetaTag(tag)
 
 function getTrailNameFromForm()
 {
-    console.log("Trail:\t"+$("#memex-trail-name").text());
+//    console.log("Trail:\t" + $("#memex-trail-name").text());
     return $("#memex-trail-name").text();
 }
 function createTrailItemFromJSON(item)
@@ -154,9 +154,9 @@ function createTrailItemFromText(title, url, tags, date, trailName) {
     trailItem.title = title;
     trailItem.url = url;
     trailItem.tags = tags.split(",");
-    if (!(typeof trailName === 'undefined') && $.inArray(trailName, trailItem.tags)===-1)
+    if (!(typeof trailName === 'undefined') && $.inArray(trailName, trailItem.tags) === -1)
     {
-        console.log("No trailName passed");
+//        console.log("No trailName passed");
         trailItem.trailName = trailName;
         trailItem.tags.push(trailName);
     }
@@ -459,7 +459,7 @@ function getNiceTime(time)
 function addEventLoadTrailItemsByTrail(selectedTrail)
 {
 //    console.log("Adding event");
-    console.log(selectedTrail);
+//    console.log(selectedTrail);
 //        console.log("Selected Trail=" + selectedTrail);
     displayContentArea(true);
     displayUserPromptArea(false);
@@ -492,42 +492,46 @@ function eventMoveTrailItemUp()
                 var newOrder = item.order - 1;
 
                 // this item just bumped another item down in order. Update its tag and its order value.
-                
+
                 $.each(currentTrailItems, function(j, itemj) {
-                    if (itemj.order == newOrder) {                    
+                    if (itemj.order == newOrder) {
                         var oldTrailNameStep = trailName + "-step" + newOrder;
-                        var newTrailNameStep = trailName + "-step" + oldOrder;                         
-                        
-                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                        var newTrailNameStep = trailName + "-step" + oldOrder;
+
+                        itemj.tags.splice($.inArray(oldTrailNameStep, itemj.tags), 1);
                         itemj.tags.push(newTrailNameStep);
                         itemj.order++;
                     }
                 });
 
                 // Now update the listing we clicked on - decrease its sorting order by 1. Change its tag, then change its order.
-                
+
                 var oldTrailNameStep = trailName + "-step" + oldOrder;
                 var newTrailNameStep = trailName + "-step" + newOrder;
-                item.tags.splice( $.inArray(oldTrailNameStep, item.tags), 1 );
-                item.tags.push(newTrailNameStep);          
+                item.tags.splice($.inArray(oldTrailNameStep, item.tags), 1);
+                item.tags.push(newTrailNameStep);
                 item.order--;
-                
+
                 console.log(currentTrailItems);
                 return false;
             }
         });
+        reloadMemex();
     });
 }
 
 function eventMoveTrailItemDown()
 {
     $(".trail-item-down").unbind("click");
+
     $(".trail-item-down").click(function() {
+        console.log("Moving down");
+        console.log(currentTrailItems);
         var trailName = getTrailNameFromForm();
         var trailItem = getTrailItemFromHTML(this);
 
         //alert("Attempting to move down item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);        
-        
+
         $.each(currentTrailItems, function(i, item) {
 
             if (item.order == trailItem.order) {
@@ -535,30 +539,32 @@ function eventMoveTrailItemDown()
                 var newOrder = item.order + 1;
 
                 // this item just bumped another item up in order (closer to 1). Update its tag and its order value.
-                
+
                 $.each(currentTrailItems, function(j, itemj) {
-                    if (itemj.order == newOrder) {                    
+                    if (itemj.order == newOrder) {
                         var oldTrailNameStep = trailName + "-step" + newOrder;
-                        var newTrailNameStep = trailName + "-step" + oldOrder;                         
-                        
-                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                        var newTrailNameStep = trailName + "-step" + oldOrder;
+
+                        itemj.tags.splice($.inArray(oldTrailNameStep, itemj.tags), 1);
                         itemj.tags.push(newTrailNameStep);
                         itemj.order--;
+//                        currentTrailItems[j].order = currentTrailItems[j].order - 1;
                     }
                 });
 
                 // Now update the listing we clicked on. Change its tag, then change its order, so that each are one higher than before.
-                
+
                 var oldTrailNameStep = trailName + "-step" + oldOrder;
                 var newTrailNameStep = trailName + "-step" + newOrder;
-                item.tags.splice( $.inArray(oldTrailNameStep, item.tags), 1 );
-                item.tags.push(newTrailNameStep);          
+                item.tags.splice($.inArray(oldTrailNameStep, item.tags), 1);
+                item.tags.push(newTrailNameStep);
                 item.order++;
-                
-                console.log(currentTrailItems);
+//                currentTrailItems[i].order = currentTrailItems[i].order + 1;
+//                console.log(currentTrailItems);
                 return false;
             }
         });
+        reloadMemex();
     });
 }
 function eventDeleteTrailItem()
@@ -574,30 +580,30 @@ function eventDeleteTrailItem()
             if (item.order == trailItem.order) {
 
                 // remove the item from currentTrailItems array
-                currentTrailItems.splice( $.inArray(item, currentTrailItems), 1 );
+                currentTrailItems.splice($.inArray(item, currentTrailItems), 1);
 
                 // find all subsequent items and change their tags to reflect their new order location. Then decrement their order value in the array.
                 $.each(currentTrailItems, function(j, itemj) {
-                    if (itemj.order > trailItem.order) {                    
-    
+                    if (itemj.order > trailItem.order) {
+
                         var oldOrder = itemj.order;
                         var newOrder = itemj.order - 1;
 
                         var oldTrailNameStep = trailName + "-step" + oldOrder;
-                        var newTrailNameStep = trailName + "-step" + newOrder;                         
- 
+                        var newTrailNameStep = trailName + "-step" + newOrder;
+
                         /*
-                        console.log("trailNameStep: " + trailNameStep);
-                        console.log("itemtitle: " + itemj.title);
-                        console.log("oldOrder: " + oldOrder);
-                        console.log("newOrder: " + newOrder);
-                        console.log("newTrailNameStep: " + newTrailNameStep);
-                        */
-                        
-                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                         console.log("trailNameStep: " + trailNameStep);
+                         console.log("itemtitle: " + itemj.title);
+                         console.log("oldOrder: " + oldOrder);
+                         console.log("newOrder: " + newOrder);
+                         console.log("newTrailNameStep: " + newTrailNameStep);
+                         */
+
+                        itemj.tags.splice($.inArray(oldTrailNameStep, itemj.tags), 1);
                         itemj.tags.push(newTrailNameStep);
                         itemj.order--;
-                        
+
                         //console.log(itemj.tags);
                     }
 
@@ -606,7 +612,7 @@ function eventDeleteTrailItem()
                 return false;
             }
         });
-        
+        reloadMemex();
 
     });
 }
@@ -621,15 +627,15 @@ function eventDeleteTrailItem()
  
  
  function renameTag(old, anew) {
-     $.ajax({
-        type: "POST",
-        url: "delicious_proxy.php",
-        data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
-        }).done(function(msg) {
-        console.log(msg);
-        });
+ $.ajax({
+ type: "POST",
+ url: "delicious_proxy.php",
+ data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
+ }).done(function(msg) {
+ console.log(msg);
+ });
  }
-*/
+ */
 
 function eventEditTrailItem()
 {
@@ -722,41 +728,27 @@ function loadURLImage(url, size)
 }
 
 
-/* * addLink
- *
- * url:  The new URL to add to the path
- * pathTag: The master tag for this path (also found in the Dummy)
- *
- * Checks the length of the path and adds new link to the end.
- */
-/*
- function eventAddLink() {
- 
- $("#submit_button").click(function() {
- try {
- console.log("submit clicked");
- //            var url = $("#memex-form-link").text();
- //            var trailName = $("#memex-trail-name").text();
- //            console.log(trailName + "\t" + url);
- 
- //            addLink(url, trailName);
- return false;
- } catch (err) {
- 
- console.log("ERROR ----------------\n\n\n"+err);
- return false;
- }
- });
- 
- }
- */
+function reloadMemex() {
 
+    $('#memex-list ol').empty();
 
-/*
- $(document).ready(function() {
- 
- var old = "brewpubs-step1";
- var new = "brewpubs-step0";
- renameTag(old, new );
- });
- */
+    var tempTrailItems = [];
+    for (var i in currentTrailItems)
+    {
+        tempTrailItems.push(currentTrailItems[i]);
+    }
+    
+    tempTrailItems=sortTrailItems(tempTrailItems, getTrailNameFromForm());
+
+    currentTrailItems = [];
+    for (var i in tempTrailItems)
+    {
+        var trailItem = tempTrailItems[i];
+        addTrailItemToMemex(trailItem);
+    }
+}
+
+function editMemexNode(node, trailItem)
+{
+    return false;
+}
