@@ -1,6 +1,7 @@
 $(document).ready(function() {
     init();
 });
+var DELICIOUS_PROXY = "http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php";
 var JSON_USERNAME = "dantsai";
 var JSON_PASSWORD = "npoc3opDL";
 var JSON_COUNT_SUFFIX = "?count=100&callback=?";
@@ -15,12 +16,10 @@ var RESULT_ITEM_EXIST_MSG = "item already exists";
 var IMG_LOAD_URL = "http://api.thumbalizr.com/?url=";
 var IMG_SIZE = "sm";
 var DUMMYTRAILS;
-var HIDE_META_TAGS=false;
-
+var HIDE_META_TAGS = true;
+var ALLOWED_MEMEX_LINK_TITLE_LENGTH = 70;
 var allTrails = [];
-
 var currentTrailItems = [];
-
 function init() {
 
     toggleMap();
@@ -31,13 +30,14 @@ function init() {
     updateTrailCountLabel();
     isTrailEmpty();
     loadRecommendations();
+    toggleShowMetaTags();
 }
 /** toggle the map view between true and false. Default is true
  * @returns {undefined}
  */
 function toggleMap()
 {
-    if ($("#map-canvas").css("display") == "none")
+    if ($("#map-canvas").css("display") === "none")
         $("#map-canvas").css("display", "inline-block");
     else
         $("#map-canvas").css("display", "none");
@@ -73,7 +73,12 @@ function TrailItem() {
  */
 function parseTrailItemLink() {
     var url = "";
-    url += "<a href='" + this.url + "' target='_blank'>" + this.title + "</a>"
+    var title = this.title;
+    if (this.title.length > ALLOWED_MEMEX_LINK_TITLE_LENGTH)
+        title = this.title.substring(0, ALLOWED_MEMEX_LINK_TITLE_LENGTH) + "...";
+//    console.log(title);
+    url += "<a href='" + this.url + "' target='_blank'>" + title + "</a>";
+
     return url;
 }
 
@@ -132,12 +137,15 @@ function isMetaTag(tag)
 
 function getTrailNameFromForm()
 {
-    console.log("Trail:\t"+$("#memex-trail-name").text());
+//    console.log("Trail:\t" + $("#memex-trail-name").text());
     return $("#memex-trail-name").text();
 }
 function createTrailItemFromJSON(item)
 {
-    return createTrailItemFromText(item.d, item.u, "" + item.t, item.dt, getTrailNameFromForm());
+//    console.log("Src TItle="+item.d);
+    var trailItem = createTrailItemFromText(item.d, item.u, "" + item.t, item.dt, getTrailNameFromForm());
+//    console.log("Dest Title ="+trailItem.title)
+    return trailItem;
 }
 
 /**
@@ -152,11 +160,12 @@ function createTrailItemFromJSON(item)
 function createTrailItemFromText(title, url, tags, date, trailName) {
     var trailItem = new TrailItem();
     trailItem.title = title;
+//    console.log(title);
     trailItem.url = url;
     trailItem.tags = tags.split(",");
-    if (!(typeof trailName === 'undefined') && $.inArray(trailName, trailItem.tags)===-1)
+    if (!(typeof trailName === 'undefined') && $.inArray(trailName, trailItem.tags) === -1)
     {
-        console.log("No trailName passed");
+//        console.log("No trailName passed");
         trailItem.trailName = trailName;
         trailItem.tags.push(trailName);
     }
@@ -183,16 +192,6 @@ function addTrailItemFromForm()
         try {
             var trailName = getTrailNameFromForm();
             var trailItem = createTrailItemFromText("", $("#memex-form-link").val(), $("#memex-form-tags").val(), new Date(), trailName);
-
-            /*
-             //            trailItem.title = $("#memex-trail-name").text();
-             trailItem.url = $("#memex-form-link").val();
-             trailItem.tags = $("#memex-form-tags").val().split(",");
-             trailItem.tags.push(trailName);
-             trailItem.date = new Date();
-             trailItem.trailName = trailName;
-             
-             */
 
             addLink(trailItem.url, trailItem.trailName, trailItem.tags);
 //            addTrailItemToMemex(trailItem);
@@ -221,7 +220,7 @@ function addLink(url, trailName, tags) {
                 var trailNameStep = trailName + "-step" + next;
                 $.ajax({
                     type: "POST",
-                    url: "delicious_proxy.php",
+                    url: DELICIOUS_PROXY,
                     data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, tags: trailNameStep + "," + tags, replace: "yes"}
                 }).done(function(msg) {
                     console.log("DONE");
@@ -344,7 +343,7 @@ function getTrailListFromDelicious(updateHTML) {
                     var tags = item.t;
 //                    if ($.inArray("Dummy", tags) > -1) {
                     $.each(tags, function(index, value) {
-                        if (value != "Dummy") {
+                        if (value !== "Dummy") {
                             allTrails.push(value);
                         }
                     });
@@ -386,13 +385,14 @@ function getTrailItemsFromDelicious(tag, updateHTML)
             function(data) {
 
                 $.each(data, function(i, item) {
+//                    console.log(item);
+//                    console.log(data[i]);
                     var trailItem = createTrailItemFromJSON(item);
-                    if ($.inArray(tag, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
+                    if ($.inArray(tag, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) === -1) {
                         trailItems.push(trailItem);
                     }
                 });
                 trailItems = sortTrailItems(trailItems, tag);
-
                 if (updateHTML)
                 {
                     for (var i in trailItems)
@@ -401,7 +401,7 @@ function getTrailItemsFromDelicious(tag, updateHTML)
                 $(".ajax-loader").css("display", "none");
                 return trailItems;
             });
-    return trailItems;
+//    return trailItems;
 }
 
 function sortTrailItems(trailItems, trailName) {
@@ -459,7 +459,7 @@ function getNiceTime(time)
 function addEventLoadTrailItemsByTrail(selectedTrail)
 {
 //    console.log("Adding event");
-    console.log(selectedTrail);
+//    console.log(selectedTrail);
 //        console.log("Selected Trail=" + selectedTrail);
     displayContentArea(true);
     displayUserPromptArea(false);
@@ -473,9 +473,9 @@ function addEventsToTrailItemMenu()
     eventMoveTrailItemDown();
     eventDeleteTrailItem();
     eventEditTrailItem();
-
-
+    eventTrailItemHover();
 }
+
 function eventMoveTrailItemUp()
 {
     $(".trail-item-up").unbind("click");
@@ -483,51 +483,46 @@ function eventMoveTrailItemUp()
 
         var trailName = getTrailNameFromForm();
         var trailItem = getTrailItemFromHTML(this);
-
         //alert("Attempting to move up item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);        
         $.each(currentTrailItems, function(i, item) {
 
             if (item.order == trailItem.order) {
                 var oldOrder = item.order;
                 var newOrder = item.order - 1;
-
                 // this item just bumped another item down in order. Update its tag and its order value.
-                
+
                 $.each(currentTrailItems, function(j, itemj) {
-                    if (itemj.order == newOrder) {                    
+                    if (itemj.order == newOrder) {
                         var oldTrailNameStep = trailName + "-step" + newOrder;
-                        var newTrailNameStep = trailName + "-step" + oldOrder;                         
-                        
-                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                        var newTrailNameStep = trailName + "-step" + oldOrder;
+                        itemj.tags.splice($.inArray(oldTrailNameStep, itemj.tags), 1);
                         itemj.tags.push(newTrailNameStep);
                         itemj.order++;
                     }
                 });
-
                 // Now update the listing we clicked on - decrease its sorting order by 1. Change its tag, then change its order.
-                
+
                 var oldTrailNameStep = trailName + "-step" + oldOrder;
                 var newTrailNameStep = trailName + "-step" + newOrder;
-                item.tags.splice( $.inArray(oldTrailNameStep, item.tags), 1 );
-                item.tags.push(newTrailNameStep);          
+                item.tags.splice($.inArray(oldTrailNameStep, item.tags), 1);
+                item.tags.push(newTrailNameStep);
                 item.order--;
-                
-                console.log(currentTrailItems);
+//                console.log(currentTrailItems);
                 return false;
             }
         });
-
         // make API call to update all of the trailItems in the trail with new orders.
         // if we wanted to be more efficient, we would only do an API call for the two that are affected. For now, let's change all of them.
         $.each(currentTrailItems, function(i, itemk) {
-            if(itemk.order >= (trailItem.order -1)) {
-                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
-                .fail(function() {
-                    alert("error");
-                });
+            if (itemk.order >= (trailItem.order - 1)) {
+                var jqxhr = $.post(DELICIOUS_PROXY,
+                        {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
+                        .fail(function() {
+                            alert("error");
+                        });
             }
         });
+        reloadMemex();
     });
 }
 
@@ -537,52 +532,47 @@ function eventMoveTrailItemDown()
     $(".trail-item-down").click(function() {
         var trailName = getTrailNameFromForm();
         var trailItem = getTrailItemFromHTML(this);
-
         //alert("Attempting to move down item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);        
-        
+
         $.each(currentTrailItems, function(i, item) {
 
             if (item.order == trailItem.order) {
                 var oldOrder = item.order;
                 var newOrder = item.order + 1;
-
                 // this item just bumped another item up in order (closer to 1). Update its tag and its order value.
-                
+
                 $.each(currentTrailItems, function(j, itemj) {
-                    if (itemj.order == newOrder) {                    
+                    if (itemj.order == newOrder) {
                         var oldTrailNameStep = trailName + "-step" + newOrder;
-                        var newTrailNameStep = trailName + "-step" + oldOrder;                         
-                        
-                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                        var newTrailNameStep = trailName + "-step" + oldOrder;
+                        itemj.tags.splice($.inArray(oldTrailNameStep, itemj.tags), 1);
                         itemj.tags.push(newTrailNameStep);
                         itemj.order--;
                     }
                 });
-
                 // Now update the listing we clicked on. Change its tag, then change its order, so that each are one higher than before.
-                
+
                 var oldTrailNameStep = trailName + "-step" + oldOrder;
                 var newTrailNameStep = trailName + "-step" + newOrder;
-                item.tags.splice( $.inArray(oldTrailNameStep, item.tags), 1 );
-                item.tags.push(newTrailNameStep);          
+                item.tags.splice($.inArray(oldTrailNameStep, item.tags), 1);
+                item.tags.push(newTrailNameStep);
                 item.order++;
-                
-                console.log(currentTrailItems);
+//                console.log(currentTrailItems);
                 return false;
             }
         });
-
         // make API call to update all of the trailItems in the trail with new orders.
         // if we wanted to be more efficient, we would only do an API call for the two that are affected. For now, let's change all of them.
         $.each(currentTrailItems, function(i, itemk) {
-            if(itemk.order >= (trailItem.order - 1)) {
-                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
-                .fail(function() {
-                    alert("error");
-                });
+            if (itemk.order >= (trailItem.order - 1)) {
+                var jqxhr = $.post(DELICIOUS_PROXY,
+                        {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
+                        .fail(function() {
+                            alert("error");
+                        });
             }
         });
+        reloadMemex();
     });
 }
 function eventDeleteTrailItem()
@@ -599,70 +589,75 @@ function eventDeleteTrailItem()
             if (item.order == trailItem.order) {
                 trailItemTags = item.tags;
                 // remove tags from selected item
-                for (var i=trailItemTags.length-1; i>=0; i--) {
+                for (var i = trailItemTags.length - 1; i >= 0; i--) {
                     if (trailItemTags[i] == trailName + "-step" + trailItem.order) {
                         trailItemTags.splice(i, 1);
                     }
                 }
-                for (var i=trailItemTags.length-1; i>=0; i--) {
+                for (var i = trailItemTags.length - 1; i >= 0; i--) {
                     if (trailItemTags[i] == trailName) {
                         trailItemTags.splice(i, 1);
                     }
                 }
                 // remove tags by re-adding without the tags
-                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: item.url, description: item.title, tags: trailItemTags.join(","), replace: 'yes'})
-                .fail(function() {
-                    alert("error");
-                });
-
+                var jqxhr = $.post(DELICIOUS_PROXY,
+                        {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: item.url, description: item.title, tags: trailItemTags.join(","), replace: 'yes'})
+                        .fail(function() {
+                            alert("error");
+                        });
                 // remove the item from currentTrailItems array
-                currentTrailItems.splice( $.inArray(item, currentTrailItems), 1 );
-
+                currentTrailItems.splice($.inArray(item, currentTrailItems), 1);
                 // find all subsequent items and change their tags to reflect their new order location. Then decrement their order value in the array.
                 $.each(currentTrailItems, function(j, itemj) {
-                    if (itemj.order > trailItem.order) {                    
-    
+                    if (itemj.order > trailItem.order) {
+
                         var oldOrder = itemj.order;
                         var newOrder = itemj.order - 1;
-
                         var oldTrailNameStep = trailName + "-step" + oldOrder;
-                        var newTrailNameStep = trailName + "-step" + newOrder;                         
- 
+                        var newTrailNameStep = trailName + "-step" + newOrder;
                         /*
-                        console.log("trailNameStep: " + trailNameStep);
-                        console.log("itemtitle: " + itemj.title);
-                        console.log("oldOrder: " + oldOrder);
-                        console.log("newOrder: " + newOrder);
-                        console.log("newTrailNameStep: " + newTrailNameStep);
-                        */
-                        
-                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                         console.log("trailNameStep: " + trailNameStep);
+                         console.log("itemtitle: " + itemj.title);
+                         console.log("oldOrder: " + oldOrder);
+                         console.log("newOrder: " + newOrder);
+                         console.log("newTrailNameStep: " + newTrailNameStep);
+                         */
+
+                        itemj.tags.splice($.inArray(oldTrailNameStep, itemj.tags), 1);
                         itemj.tags.push(newTrailNameStep);
                         itemj.order--;
-                        
                         //console.log(itemj.tags);
                     }
 
                 });
-                console.log(currentTrailItems);
+//                console.log(currentTrailItems);
                 return false;
             }
         });
-
         // make API call to update all of the trailItems in the trail with new orders.
         // if we wanted to be more efficient, we would only do an API call for the two that are affected. For now, let's change all of them.
         $.each(currentTrailItems, function(i, itemk) {
-            if(itemk.order >= (trailItem.order - 1)) {
-                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
-                .fail(function() {
-                    alert("error");
-                });
+            if (itemk.order >= (trailItem.order - 1)) {
+                var jqxhr = $.post(DELICIOUS_PROXY,
+                        {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
+                        .fail(function() {
+                            alert("error");
+                        });
             }
         });
+        reloadMemex();
+    });
+}
 
 
+function eventTrailItemHover()
+{
+    $('.trail-item').unbind("hover");
+    $('.trail-item').hover(function() {
+//        alert("HOVERING");
+        $(this).children('.trail-item-order').css("opacity", ".7");
+    }, function() {
+        $(this).children('.trail-item-order').css("opacity", ".1");
     });
 }
 
@@ -676,15 +671,15 @@ function eventDeleteTrailItem()
  
  
  function renameTag(old, anew) {
-     $.ajax({
-        type: "POST",
-        url: "delicious_proxy.php",
-        data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
-        }).done(function(msg) {
-        console.log(msg);
-        });
+ $.ajax({
+ type: "POST",
+ url: "delicious_proxy.php",
+ data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
+ }).done(function(msg) {
+ console.log(msg);
+ });
  }
-*/
+ */
 
 function eventEditTrailItem()
 {
@@ -704,7 +699,6 @@ function getTrailItemFromHTML(item)
     trailItem.url = $(item).parents('.trail-item').children('.trail-item-link').children('a').attr("href");
 //    console.log(trailItem);
     return trailItem;
-
 }
 
 function displayUserPromptArea(display)
@@ -755,7 +749,6 @@ function addRecommendationItem(trailItem, category)
 //    console.log(list);
     var str = "<li>" + trailItem.parseTrailItemLink() + "</br><p>" + getNiceTime(trailItem.date) + "</p>";
     str += "<input class='add-recommendation-to-memex' type='button' value='Add'></li>";
-
     $(list).append(str);
 }
 
@@ -765,33 +758,7 @@ function eventAddRecommendationToMemex()
     $(".add-recommendation-to-memex").click(function() {
         var name = $(this).siblings('a').attr("href");
         var url = $(this).siblings('a').text();
-
-        // alert("adding recommendation: " + url);
-        // get existing tags for this bookmark
-        var jqxhr = $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-            {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: url}
-        )
-        .done (function(data) {
-            var tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
-            // alert("tags before: " + tags);
-
-            // get current length of trail, add one
-            var newLength = $("#memex-list ol").children().length + 1;
-            tags = tags + "," + getTrailNameFromForm() + "," + getTrailNameFromForm() + "-step" + newLength; 
-            // alert("tags after: " + tags);
-            $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-                {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
-            )
-            .done (function(data) { 
-                // alert("post/add done");
-            })
-            .fail (function() {
-                alert("post/add failed");
-            });
-        })
-        .fail(function() {
-            alert("post/get failed");
-        });
+        alert("adding recommendation: " + url);
     });
 }
 function loadURLImage(url, size)
@@ -800,88 +767,129 @@ function loadURLImage(url, size)
 //   return IMG_LOAD_URL + "stwsize=" + size + "&stwurl=" + url;
     return IMG_LOAD_URL + url;
 }
+function reloadMemex() {
+    console.log(currentTrailItems);
+    $('#memex-list ol').empty();
+    var tempTrailItems = [];
+    for (var i in currentTrailItems)
+    {
+        var tempItem = currentTrailItems[i];
+        tempTrailItems.push(tempItem);
+    }
+    console.log(tempTrailItems);
+    tempTrailItems = sortTrailItems(tempTrailItems, getTrailNameFromForm());
+    currentTrailItems = [];
+    console.log(tempTrailItems);
+    for (var i in tempTrailItems)
+    {
+        var trailItem = tempTrailItems[i];
+        addTrailItemToMemex(trailItem);
+    }
+}
+function editMemexNode(node, trailItem)
+{
+    return false;
+}
 
-function addTrail () {
+function addTrail() {
+
 
     //$.getJSON("https://dantsai:npoc3opDL@api.delicious.com/v1/tags/rename?callback=?old=mytrail&new=hahaha",
-    $.getJSON("http://feeds.delicious.com/v2/json/dantsai?count=100&callback=?", function(data) {
-        $.each(data, function(i, item){
+    $.getJSON(JSON_READ, function(data) {
+        $.each(data, function(i, item) {
             var title = item.d;
             var url = item.u;
             var date = item.dt;
-            $("#sortable2").append('<li><a href="'+url+'">'+title+'</a> <time>'+getNiceTime(date)+'<time></li>');
+            $("#sortable2").append('<li><a href="' + url + '">' + title + '</a> <time>' + getNiceTime(date) + '<time></li>');
         });
 
-        $(".ajax-loader").css("display","none");
+
+        $(".ajax-loader").css("display", "none");
     });
 
-    $( "#sortable1, #sortable2" ).sortable({
+
+    $("#sortable1, #sortable2").sortable({
         connectWith: ".connectedSort"
     }).disableSelection();
 
+
     $("#createTrail").submit(function(event) {
         //event.preventDefault();
+
 
         // iterate through each bookmark in sortable1
         $("#sortable1").children().each(function(index) {
             var url = $(this).children().first().attr("href");
             var trailname = $("#trailName").val();
-            var index2 = index+1;
+            var index2 = index + 1;
             var tags;
             // get existing bookmark's tags
 
-            var jqxhr = $.get("delicious_proxy.php",
-                {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: url}
-            )
-            .done (function(data) {
-                tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
-                // alert("tags before: " + tags);
-                tags = tags + "," + trailname + "," + trailname + "-step" + index2; 
-                // alert("tags after: " + tags);
-                $.get("delicious_proxy.php",
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
-                )
-                .done (function(data) { 
-                    $("#submitStatus").html("updated!");
 
-                    // Also tag the new trail name to the Dummy
-                    var jqxhr = $.get("delicious_proxy.php",
-                        {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: "www.tripadvisor.com"}
-                    )
-                    .done (function(data) {
-                        tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
-                        var tagarr = tags.split(",");
-                        if($.inArray(trailname, tagarr) == -1) {
-                            tags = tags + "," + trailname; 
-                            // alert("tags after: " + tags);
-                            $.get("delicious_proxy.php",
-                                {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: "www.tripadvisor.com", tags: tags, replace: 'yes'}
-                            );
-                        }
-                    }); // End update Dummy
-                })
-                .fail (function() {
-                    alert("post/add failed");
-                });
-            })
-            .fail(function() {
-                alert("post/get failed");
-            });
+            var jqxhr = $.get(DELICIOUS_PROXY,
+                    {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/get', url: url}
+            )
+                    .done(function(data) {
+                        tags = $(data.xml).contents().attr("tag").replace(/ /g, ",");
+                        // alert("tags before: " + tags);
+                        tags = tags + "," + trailname + "," + trailname + "-step" + index2;
+                        // alert("tags after: " + tags);
+                        $.get(DELICIOUS_PROXY,
+                                {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: url, tags: tags, replace: 'yes'}
+                        )
+                                .done(function(data) {
+                                    $("#submitStatus").html("updated!");
+
+
+                                    // Also tag the new trail name to the Dummy
+                                    var jqxhr = $.get(DELICIOUS_PROXY,
+                                            {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/get', url: "www.tripadvisor.com"}
+                                    )
+                                            .done(function(data) {
+                                                tags = $(data.xml).contents().attr("tag").replace(/ /g, ",");
+                                                var tagarr = tags.split(",");
+                                                if ($.inArray(trailname, tagarr) === -1) {
+                                                    tags = tags + "," + trailname;
+                                                    // alert("tags after: " + tags);
+                                                    $.get(DELICIOUS_PROXY,
+                                                            {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: "www.tripadvisor.com", tags: tags, replace: 'yes'}
+                                                    );
+                                                }
+                                            }); // End update Dummy
+                                })
+                                .fail(function() {
+                                    alert("post/add failed");
+                                });
+                    })
+                    .fail(function() {
+                        alert("post/get failed");
+                    });
         });
         event.preventDefault();
     });
 }
+
 
 // Read a page's GET URL variables and return them as an associative array.
 function getUrlVars()
 {
     var vars = [], hash;
     var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-    for(var i = 0; i < hashes.length; i++)
+    for (var i = 0; i < hashes.length; i++)
     {
         hash = hashes[i].split('=');
         vars.push(hash[0]);
         vars[hash[0]] = hash[1];
     }
     return vars;
+}
+function toggleShowMetaTags()
+{
+    $('#show-meta-tags-link').change(function() {
+
+        HIDE_META_TAGS = !this.checked;
+
+        reloadMemex();
+
+    });
 }
