@@ -15,6 +15,7 @@ var RESULT_ITEM_EXIST_MSG = "item already exists";
 var IMG_LOAD_URL = "http://api.thumbalizr.com/?url=";
 var IMG_SIZE = "sm";
 var DUMMYTRAILS;
+var HIDE_META_TAGS=false;
 
 var allTrails = [];
 
@@ -99,7 +100,7 @@ function formatTrailItemHTML() {
     for (var i = 0; i < this.tags.length; i++)
     {
         var tag = this.tags[i];
-        if (!isMetaTag(tag))
+        if (!isMetaTag(tag) || !HIDE_META_TAGS)
             item += "<li>" + tag + "</li>";
     }
     item += "</ul>";
@@ -131,6 +132,7 @@ function isMetaTag(tag)
 
 function getTrailNameFromForm()
 {
+    console.log("Trail:\t"+$("#memex-trail-name").text());
     return $("#memex-trail-name").text();
 }
 function createTrailItemFromJSON(item)
@@ -152,8 +154,9 @@ function createTrailItemFromText(title, url, tags, date, trailName) {
     trailItem.title = title;
     trailItem.url = url;
     trailItem.tags = tags.split(",");
-    if (!(typeof trailName === 'undefined'))
+    if (!(typeof trailName === 'undefined') && $.inArray(trailName, trailItem.tags)===-1)
     {
+        console.log("No trailName passed");
         trailItem.trailName = trailName;
         trailItem.tags.push(trailName);
     }
@@ -162,7 +165,8 @@ function createTrailItemFromText(title, url, tags, date, trailName) {
     else
         trailItem.date = date;
 //    trailItem.tags.push(title);
-    trailItem.image = loadURLImage(url, IMG_SIZE)
+    trailItem.image = loadURLImage(url, IMG_SIZE);
+//    console.log(trailItem);
     return trailItem;
 }
 
