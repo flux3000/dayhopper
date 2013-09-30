@@ -16,6 +16,7 @@ var IMG_LOAD_URL = "http://api.thumbalizr.com/?url=";
 var IMG_SIZE = "sm";
 var DUMMYTRAILS;
 var HIDE_META_TAGS = true;
+var ALLOWED_MEMEX_LINK_TITLE_LENGTH = 70;
 
 var allTrails = [];
 
@@ -73,7 +74,12 @@ function TrailItem() {
  */
 function parseTrailItemLink() {
     var url = "";
-    url += "<a href='" + this.url + "' target='_blank'>" + this.title + "</a>"
+    var title = this.title;
+    if (this.title.length > ALLOWED_MEMEX_LINK_TITLE_LENGTH)
+        title = this.title.substring(0, ALLOWED_MEMEX_LINK_TITLE_LENGTH) + "...";
+//    console.log(title);
+    url += "<a href='" + this.url + "' target='_blank'>" + title + "</a>"
+
     return url;
 }
 
@@ -137,7 +143,10 @@ function getTrailNameFromForm()
 }
 function createTrailItemFromJSON(item)
 {
-    return createTrailItemFromText(item.d, item.u, "" + item.t, item.dt, getTrailNameFromForm());
+//    console.log("Src TItle="+item.d);
+    var trailItem = createTrailItemFromText(item.d, item.u, "" + item.t, item.dt, getTrailNameFromForm());
+//    console.log("Dest Title ="+trailItem.title)
+    return trailItem;
 }
 
 /**
@@ -152,6 +161,7 @@ function createTrailItemFromJSON(item)
 function createTrailItemFromText(title, url, tags, date, trailName) {
     var trailItem = new TrailItem();
     trailItem.title = title;
+//    console.log(title);
     trailItem.url = url;
     trailItem.tags = tags.split(",");
     if (!(typeof trailName === 'undefined') && $.inArray(trailName, trailItem.tags) === -1)
@@ -386,7 +396,10 @@ function getTrailItemsFromDelicious(tag, updateHTML)
             function(data) {
 
                 $.each(data, function(i, item) {
+                    console.log(item);
+                    console.log(data[i]);
                     var trailItem = createTrailItemFromJSON(item);
+
                     if ($.inArray(tag, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
                         trailItems.push(trailItem);
                     }
@@ -401,7 +414,7 @@ function getTrailItemsFromDelicious(tag, updateHTML)
                 $(".ajax-loader").css("display", "none");
                 return trailItems;
             });
-    return trailItems;
+//    return trailItems;
 }
 
 function sortTrailItems(trailItems, trailName) {
@@ -473,6 +486,7 @@ function addEventsToTrailItemMenu()
     eventMoveTrailItemDown();
     eventDeleteTrailItem();
     eventEditTrailItem();
+    eventTrailItemHover();
 
 
 }
@@ -516,7 +530,22 @@ function eventMoveTrailItemUp()
                 return false;
             }
         });
+<<<<<<< HEAD
         reloadMemex();
+=======
+
+        // make API call to update all of the trailItems in the trail with new orders.
+        // if we wanted to be more efficient, we would only do an API call for the two that are affected. For now, let's change all of them.
+        $.each(currentTrailItems, function(i, itemk) {
+            if(itemk.order >= (trailItem.order -1)) {
+                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
+                .fail(function() {
+                    alert("error");
+                });
+            }
+        });
+>>>>>>> d4a50a087b90a7af1aff9078e3e627d5c3993f39
     });
 }
 
@@ -564,7 +593,22 @@ function eventMoveTrailItemDown()
                 return false;
             }
         });
+<<<<<<< HEAD
         reloadMemex();
+=======
+
+        // make API call to update all of the trailItems in the trail with new orders.
+        // if we wanted to be more efficient, we would only do an API call for the two that are affected. For now, let's change all of them.
+        $.each(currentTrailItems, function(i, itemk) {
+            if(itemk.order >= (trailItem.order - 1)) {
+                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
+                .fail(function() {
+                    alert("error");
+                });
+            }
+        });
+>>>>>>> d4a50a087b90a7af1aff9078e3e627d5c3993f39
     });
 }
 function eventDeleteTrailItem()
@@ -573,11 +617,30 @@ function eventDeleteTrailItem()
     $(".trail-item-delete").click(function() {
         var trailName = getTrailNameFromForm();
         var trailItem = getTrailItemFromHTML(this);
+        var trailItemTags;
         //alert("Attempting to delete item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
 
         $.each(currentTrailItems, function(i, item) {
 
             if (item.order == trailItem.order) {
+                trailItemTags = item.tags;
+                // remove tags from selected item
+                for (var i=trailItemTags.length-1; i>=0; i--) {
+                    if (trailItemTags[i] == trailName + "-step" + trailItem.order) {
+                        trailItemTags.splice(i, 1);
+                    }
+                }
+                for (var i=trailItemTags.length-1; i>=0; i--) {
+                    if (trailItemTags[i] == trailName) {
+                        trailItemTags.splice(i, 1);
+                    }
+                }
+                // remove tags by re-adding without the tags
+                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: item.url, description: item.title, tags: trailItemTags.join(","), replace: 'yes'})
+                .fail(function() {
+                    alert("error");
+                });
 
                 // remove the item from currentTrailItems array
                 currentTrailItems.splice($.inArray(item, currentTrailItems), 1);
@@ -612,9 +675,37 @@ function eventDeleteTrailItem()
                 return false;
             }
         });
+<<<<<<< HEAD
         reloadMemex();
 
     });
+}
+=======
+
+        // make API call to update all of the trailItems in the trail with new orders.
+        // if we wanted to be more efficient, we would only do an API call for the two that are affected. For now, let's change all of them.
+        $.each(currentTrailItems, function(i, itemk) {
+            if(itemk.order >= (trailItem.order - 1)) {
+                var jqxhr = $.post("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: itemk.url, description: itemk.title, tags: itemk.tags.join(","), replace: 'yes'})
+                .fail(function() {
+                    alert("error");
+                });
+            }
+        });
+
+>>>>>>> d4a50a087b90a7af1aff9078e3e627d5c3993f39
+
+function eventTrailItemHover()
+{
+    $('.trail-item').unbind("hover")
+    $('.trail-item').hover(function() {
+//        alert("HOVERING");
+        $(this).children('.trail-item-order').css("opacity", ".7");
+    }, function(){
+          $(this).children('.trail-item-order').css("opacity", ".1");
+    });
+
 }
 
 /*
@@ -737,8 +828,8 @@ function reloadMemex() {
     {
         tempTrailItems.push(currentTrailItems[i]);
     }
-    
-    tempTrailItems=sortTrailItems(tempTrailItems, getTrailNameFromForm());
+
+    tempTrailItems = sortTrailItems(tempTrailItems, getTrailNameFromForm());
 
     currentTrailItems = [];
     for (var i in tempTrailItems)
