@@ -288,7 +288,7 @@ function addTrailItemToMemex(trailItem)
     addEventsToTrailItemMenu();
     /*removeItem();*/
     updateTrailCountLabel();
-//    console.log(currentTrailItems);
+    // console.log(currentTrailItems);
     return false;
 }
 /**
@@ -476,8 +476,42 @@ function eventMoveTrailItemUp()
 {
     $(".trail-item-up").unbind("click");
     $(".trail-item-up").click(function() {
+
+        var trailName = getTrailNameFromForm();
         var trailItem = getTrailItemFromHTML(this);
-        alert("Attempting to move up item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
+
+        //alert("Attempting to move up item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);        
+        $.each(currentTrailItems, function(i, item) {
+
+            if (item.order == trailItem.order) {
+                var oldOrder = item.order;
+                var newOrder = item.order - 1;
+
+                // this item just bumped another item down in order. Update its tag and its order value.
+                
+                $.each(currentTrailItems, function(j, itemj) {
+                    if (itemj.order == newOrder) {                    
+                        var oldTrailNameStep = trailName + "-step" + newOrder;
+                        var newTrailNameStep = trailName + "-step" + oldOrder;                         
+                        
+                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                        itemj.tags.push(newTrailNameStep);
+                        itemj.order++;
+                    }
+                });
+
+                // Now update the listing we clicked on - decrease its sorting order by 1. Change its tag, then change its order.
+                
+                var oldTrailNameStep = trailName + "-step" + oldOrder;
+                var newTrailNameStep = trailName + "-step" + newOrder;
+                item.tags.splice( $.inArray(oldTrailNameStep, item.tags), 1 );
+                item.tags.push(newTrailNameStep);          
+                item.order--;
+                
+                console.log(currentTrailItems);
+                return false;
+            }
+        });
     });
 }
 
@@ -485,19 +519,114 @@ function eventMoveTrailItemDown()
 {
     $(".trail-item-down").unbind("click");
     $(".trail-item-down").click(function() {
+        var trailName = getTrailNameFromForm();
         var trailItem = getTrailItemFromHTML(this);
-        alert("Attempting to move down item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
+
+        //alert("Attempting to move down item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);        
+        
+        $.each(currentTrailItems, function(i, item) {
+
+            if (item.order == trailItem.order) {
+                var oldOrder = item.order;
+                var newOrder = item.order + 1;
+
+                // this item just bumped another item up in order (closer to 1). Update its tag and its order value.
+                
+                $.each(currentTrailItems, function(j, itemj) {
+                    if (itemj.order == newOrder) {                    
+                        var oldTrailNameStep = trailName + "-step" + newOrder;
+                        var newTrailNameStep = trailName + "-step" + oldOrder;                         
+                        
+                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                        itemj.tags.push(newTrailNameStep);
+                        itemj.order--;
+                    }
+                });
+
+                // Now update the listing we clicked on. Change its tag, then change its order, so that each are one higher than before.
+                
+                var oldTrailNameStep = trailName + "-step" + oldOrder;
+                var newTrailNameStep = trailName + "-step" + newOrder;
+                item.tags.splice( $.inArray(oldTrailNameStep, item.tags), 1 );
+                item.tags.push(newTrailNameStep);          
+                item.order++;
+                
+                console.log(currentTrailItems);
+                return false;
+            }
+        });
     });
 }
 function eventDeleteTrailItem()
 {
     $(".trail-item-delete").unbind("click");
     $(".trail-item-delete").click(function() {
+        var trailName = getTrailNameFromForm();
         var trailItem = getTrailItemFromHTML(this);
-        alert("Attempting to delete item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
-    });
+        //alert("Attempting to delete item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
 
+        $.each(currentTrailItems, function(i, item) {
+
+            if (item.order == trailItem.order) {
+
+                // remove the item from currentTrailItems array
+                currentTrailItems.splice( $.inArray(item, currentTrailItems), 1 );
+
+                // find all subsequent items and change their tags to reflect their new order location. Then decrement their order value in the array.
+                $.each(currentTrailItems, function(j, itemj) {
+                    if (itemj.order > trailItem.order) {                    
+    
+                        var oldOrder = itemj.order;
+                        var newOrder = itemj.order - 1;
+
+                        var oldTrailNameStep = trailName + "-step" + oldOrder;
+                        var newTrailNameStep = trailName + "-step" + newOrder;                         
+ 
+                        /*
+                        console.log("trailNameStep: " + trailNameStep);
+                        console.log("itemtitle: " + itemj.title);
+                        console.log("oldOrder: " + oldOrder);
+                        console.log("newOrder: " + newOrder);
+                        console.log("newTrailNameStep: " + newTrailNameStep);
+                        */
+                        
+                        itemj.tags.splice( $.inArray(oldTrailNameStep, itemj.tags), 1 );
+                        itemj.tags.push(newTrailNameStep);
+                        itemj.order--;
+                        
+                        //console.log(itemj.tags);
+                    }
+
+                });
+                console.log(currentTrailItems);
+                return false;
+            }
+        });
+        
+
+    });
 }
+
+/*
+ * renameTag
+ *
+ *
+ *
+ * Simple rename of tag, will be useful for re-ordering the steps
+ * Currently not working.  Anyone see why?
+ 
+ 
+ function renameTag(old, anew) {
+     $.ajax({
+        type: "POST",
+        url: "delicious_proxy.php",
+        data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
+        }).done(function(msg) {
+        console.log(msg);
+        });
+ }
+*/
+
 function eventEditTrailItem()
 {
     $(".trail-item-edit").unbind("click");
@@ -619,23 +748,6 @@ function loadURLImage(url, size)
  */
 
 
-/*
- * renameTag
- *
- *
- *
- * Simple rename of tag, will be useful for re-ordering the steps
- * Currently not working.  Anyone see why?
- 
- function renameTag(old, anew) {
- $.ajax({
- type: "POST",
- url: "delicious_proxy.php",
- data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
- }).done(function(msg) {
- console.log(msg);
- });
- }*/
 /*
  $(document).ready(function() {
  
