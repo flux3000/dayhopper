@@ -133,9 +133,12 @@ input[type=submit]{
 
 #add-new-title{
     padding:10px;
+    margin: 0px;
+}
+#memex-form-title{
+        padding:10px;
     margin: 0px -10px;
 }
-
 #recommendations-title{
 
     padding:10px;
@@ -238,12 +241,14 @@ input[type=submit]{
 .trail-item a{
     height:20px;
     color: #4472C4;
+
 }
 .trail-item p{
     color:#a2a2a2;
     overflow: hidden;
     height: 20px;
 }
+
 
 .trail-item img{
     z-index: 200;
@@ -282,8 +287,8 @@ input[type=submit]{
     opacity:1;
 }
 .trail-item-menu li{
-    padding:5px;
-    font-size: large;
+    padding:2px;
+    font-size: small;
 }
 .trail-item-menu li:hover{
     color:white;
@@ -291,23 +296,16 @@ input[type=submit]{
 
 }
 .trail-item-link{
-
-}
-.trail-item-order{
-
-    z-index: 1;
-    position:absolute;
-    text-align: center;
-    font-size: 80pt;
-    width:360px;
-
-    opacity:.1;
-    color: #4472C4
+    width:310px;
+    word-break: break-all;
+    float: left;
+    z-index: 2;
+    position: absolute;
 }
 
-.trail-item-order:hover{
-    opacity:.7;
-}
+/*.trail-item-link a{
+ text-wrap: supress;
+}*/
 
 button#new-trail-button {
     padding: 1px 3px;
@@ -325,3 +323,20 @@ input#new-trail-name {
     font-size: 14pt;
     font-family: 'Ropa Sans', sans-serif;
 }
+
+.trail-item-order{
+
+    z-index: 1;
+    position:absolute;
+    text-align: center;
+    font-size: 80pt;
+    width:360px;
+
+    opacity:.1;
+    color: #4472C4
+}
+
+/*.trail-item-order:hover{
+    opacity:.7;
+
+}*/
