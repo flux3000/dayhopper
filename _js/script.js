@@ -16,7 +16,9 @@ var IMG_LOAD_URL = "http://api.thumbalizr.com/?url=";
 var IMG_SIZE = "sm";
 var DUMMYTRAILS;
 
-var currentTrailItems=[];
+var allTrails = [];
+
+var currentTrailItems = [];
 
 function init() {
 
@@ -92,30 +94,41 @@ function formatTrailItemHTML() {
     item += "</ul></div>";
     item += "<div class='trail-item-order' value='" + this.order + "'>" + this.order + "</div>";
     item += "<div class='trail-item-link'>" + this.parseTrailItemLink() + "</div>";
-    item += "</br><p>" + getNiceTime(this.date) + "</p>";
+//    item += "</br><p>" + getNiceTime(this.date) + "</p>";
     item += "</br><ul class='trail-item-tags'>";
     for (var i = 0; i < this.tags.length; i++)
     {
         var tag = this.tags[i];
-//        console.log(this.trailName + "..\t" + tag);
-
-        var isTag = tag === this.trailName;
-        var isStep;
-        try {
-            isStep = (this.trailName + "-step") === tag.substring(0, this.trailName.length + 5);
-        } catch (err)
-        {
-            console.log(err);
-            isStep = false;
-        }
-//        console.log("Stripped tag\t" + tag.substring(0, this.trailName.length + 5));
-        if (!isTag && !isStep)
+        if (!isMetaTag(tag))
             item += "<li>" + tag + "</li>";
     }
     item += "</ul>";
     item += "</div></li>";
     return item;
 }
+/**
+ * check if the tag is a trail name or a trail step
+ * @param {String} tag
+ * @returns {Boolean} true if the tag is trail or step
+ */
+function isMetaTag(tag)
+{
+
+    for (var i in allTrails)
+    {
+        var trail = allTrails[i];
+        if (tag === trail)
+            return true;
+        try {
+            if ((trail + "-step") === tag.substring(0, trail.length + 5))
+                return true;
+        } catch (err) {
+            continue;
+        }
+    }
+    return false;
+}
+
 function getTrailNameFromForm()
 {
     return $("#memex-trail-name").text();
@@ -128,9 +141,10 @@ function createTrailItemFromJSON(item)
 /**
  * Create a new TrailItem from text
  * @param {String} title
- * @param {String} link
+ * @param {String} url
  * @param {Array of Strings} tags
  * @param {Date} date
+ * @param {String} trailName
  * @returns {createTrailItemFromText.trailItem|TrailItem}
  */
 function createTrailItemFromText(title, url, tags, date, trailName) {
@@ -139,7 +153,10 @@ function createTrailItemFromText(title, url, tags, date, trailName) {
     trailItem.url = url;
     trailItem.tags = tags.split(",");
     if (!(typeof trailName === 'undefined'))
+    {
         trailItem.trailName = trailName;
+        trailItem.tags.push(trailName);
+    }
     if (typeof date === 'undefined')
         trailItem.date = new Date();
     else
@@ -161,16 +178,20 @@ function addTrailItemFromForm()
     $("#submit_button").click(function() {
         try {
             var trailName = getTrailNameFromForm();
-            var trailItem = new TrailItem();
-//            trailItem.title = $("#memex-trail-name").text();
-            trailItem.url = $("#memex-form-link").val();
-            trailItem.tags = $("#memex-form-tags").val().split(",");
-            trailItem.tags.push(trailName);
-            trailItem.date = new Date();
-            trailItem.trailName = trailName;
-            addLink(trailItem.url, trailName, trailItem.tags);
+            var trailItem = createTrailItemFromText("", $("#memex-form-link").val(), $("#memex-form-tags").val(), new Date(), trailName);
 
-            addTrailItemToMemex(trailItem);
+            /*
+             //            trailItem.title = $("#memex-trail-name").text();
+             trailItem.url = $("#memex-form-link").val();
+             trailItem.tags = $("#memex-form-tags").val().split(",");
+             trailItem.tags.push(trailName);
+             trailItem.date = new Date();
+             trailItem.trailName = trailName;
+             
+             */
+
+            addLink(trailItem.url, trailItem.trailName, trailItem.tags);
+//            addTrailItemToMemex(trailItem);
 //            console.log("submit clicked");
 //            var url = $("#memex-form-link").text();
 
@@ -217,37 +238,37 @@ function addLink(url, trailName, tags) {
             });
 }
 
-
-function addLink(url, trailName, tags) {
-//    console.log("Adding link");
-    $.getJSON(JSON_EDIT + trailName + "?callback=?",
-            {},
-            function(data) {
-                // next is the next Step # for this Path
-                var next = data.length;
-                var trailNameStep = trailName + "-step" + next;
-                $.ajax({
-                    type: "POST",
-                    url: "delicious_proxy.php",
-                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, tags: trailNameStep + "," + tags, replace: "yes"}
-                }).done(function(msg) {
-                    console.log("DONE");
-                    console.log(msg);
-                    var result_code = msg.result_code;
-                    console.log("RESULT:" + result_code);
-                    if (result_code === RESULT_ITEM_EXIST_MSG)
-                    {
-                        alert(RESULT_ITEM_EXIST_MSG);
-                    }
-                    if (result_code === "done")
-                    {
-                        getTrailItemsFromDelicious(trailNameStep, true);
-                    }
-
-
-                });
-            });
-}
+//
+//function addLink(url, trailName, tags) {
+////    console.log("Adding link");
+//    $.getJSON(JSON_EDIT + trailName + "?callback=?",
+//            {},
+//            function(data) {
+//                // next is the next Step # for this Path
+//                var next = data.length;
+//                var trailNameStep = trailName + "-step" + next;
+//                $.ajax({
+//                    type: "POST",
+//                    url: "delicious_proxy.php",
+//                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, tags: trailNameStep + "," + tags, replace: "yes"}
+//                }).done(function(msg) {
+//                    console.log("DONE");
+//                    console.log(msg);
+//                    var result_code = msg.result_code;
+//                    console.log("RESULT:" + result_code);
+//                    if (result_code === RESULT_ITEM_EXIST_MSG)
+//                    {
+//                        alert(RESULT_ITEM_EXIST_MSG);
+//                    }
+//                    if (result_code === "done")
+//                    {
+//                        getTrailItemsFromDelicious(trailNameStep, true);
+//                    }
+//
+//
+//                });
+//            });
+//}
 
 
 
@@ -264,25 +285,15 @@ function addTrailItemToMemex(trailItem)
     /*listEl.hide();*/
     $("#memex-list ol").append(listEl);
     $("#empty-memex-list").css("display", "none");
+    addEventsToTrailItemMenu();
     /*removeItem();*/
     updateTrailCountLabel();
-    console.log(currentTrailItems);
+//    console.log(currentTrailItems);
     return false;
 }
-
-/*
- function removeItem()
- {
- $(".todo-list-remove").click(function() {
- $(this).parent("#todo-list li").fadeOut();
- $(this).parent("#todo-list li").remove("#todo-list li");
- if (isListEmpty()) {
- 
- $("#empty-todo-list").css("display", "block");
- }
- updateLabel();
- });
- }
+/**
+ * check if memex trail is empty
+ * @returns {Boolean}
  */
 function isTrailEmpty() {
 
@@ -295,6 +306,10 @@ function isTrailEmpty() {
     $("#empty-memex-list").css("display", "none");
     return false;
 }
+/*
+ * get the size of the memext trail
+ * @returns {jQuery.length}
+ */
 function getTrailSize() {
     return $("#memex-list ol").children("li").length;
 }
@@ -317,7 +332,7 @@ function updateTrailCountLabel() {
  * @returns {undefined}
  */
 function getTrailListFromDelicious(updateHTML) {
-    var trails = [];
+
     $.getJSON(JSON_DUMMY,
             function(data) {
                 $.each(data, function(i, item) {
@@ -326,14 +341,14 @@ function getTrailListFromDelicious(updateHTML) {
 //                    if ($.inArray("Dummy", tags) > -1) {
                     $.each(tags, function(index, value) {
                         if (value != "Dummy") {
-                            trails.push(value);
+                            allTrails.push(value);
                         }
                     });
 //                    } 
                 });
                 // Check if trail exists before sending user to create page
                 $("#create").submit(function(event) {
-                    if($.inArray($("#new-trail-name").val(), trails) > -1) {
+                    if ($.inArray($("#new-trail-name").val(), allTrails) > -1) {
                         // Trail exists.  
                         // Load the existing trail.
                         addEventLoadTrailItemsByTrail($("#new-trail-name").val());
@@ -343,9 +358,9 @@ function getTrailListFromDelicious(updateHTML) {
                 });
                 if (updateHTML)
                 {
-                    for (var trail in trails)
+                    for (var trail in allTrails)
                     {
-                        var str = "<li>" + trails[trail] + "</li>";
+                        var str = "<li>" + allTrails[trail] + "</li>";
                         $("#trail-grid").append(str);
                     }
                     $("#trail-grid li").click(function() {
@@ -354,7 +369,12 @@ function getTrailListFromDelicious(updateHTML) {
                 }
             });
 }
-
+/**
+ * Get a list of trailItems from Delicious by tag (including trailName)
+ * @param {String} tag
+ * @param {Boolean} updateHTML
+ * @returns {Array|sortTrailItems.newTrailItems|getTrailItemsFromDelicious.trailItems}
+ */
 function getTrailItemsFromDelicious(tag, updateHTML)
 {
     var trailItems = [];
@@ -379,33 +399,7 @@ function getTrailItemsFromDelicious(tag, updateHTML)
             });
     return trailItems;
 }
-/*
- function getTrailItemFromDeliciousByTag(tag, updateHTML)
- {
- var trailItems = [];
- 
- $.getJSON(JSON_ROOT+"/"+tag+JSON_COUNT_SUFFIX,
- function(data) {
- 
- $.each(data, function(i, item) {
- var trailItem = createTrailItemFromJSON(item);
- if ($.inArray(trailName, trailItem.tags) > -1 && $.inArray("Dummy", trailItem.tags) == -1) {
- trailItems.push(trailItem);
- }
- });
- trailItems = sortTrailItems(trailItems, trailName);
- if (updateHTML)
- {
- for (var i in trailItems)
- addTrailItemToMemex(trailItems[i]);
- }
- $(".ajax-loader").css("display", "none");
- return trailItems;
- });
- return trailItems;
- }
- 
- */
+
 function sortTrailItems(trailItems, trailName) {
 
     var newTrailItems = [];
@@ -469,6 +463,61 @@ function addEventLoadTrailItemsByTrail(selectedTrail)
     getTrailItemsFromDelicious(selectedTrail, true);
     return;
 }
+function addEventsToTrailItemMenu()
+{
+    eventMoveTrailItemUp();
+    eventMoveTrailItemDown();
+    eventDeleteTrailItem();
+    eventEditTrailItem();
+
+
+}
+function eventMoveTrailItemUp()
+{
+    $(".trail-item-up").unbind("click");
+    $(".trail-item-up").click(function() {
+        var trailItem = getTrailItemFromHTML(this);
+        alert("Attempting to move up item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
+    });
+}
+
+function eventMoveTrailItemDown()
+{
+    $(".trail-item-down").unbind("click");
+    $(".trail-item-down").click(function() {
+        var trailItem = getTrailItemFromHTML(this);
+        alert("Attempting to move down item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
+    });
+}
+function eventDeleteTrailItem()
+{
+    $(".trail-item-delete").unbind("click");
+    $(".trail-item-delete").click(function() {
+        var trailItem = getTrailItemFromHTML(this);
+        alert("Attempting to delete item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
+    });
+
+}
+function eventEditTrailItem()
+{
+    $(".trail-item-edit").unbind("click");
+    $(".trail-item-edit").click(function() {
+        var trailItem = getTrailItemFromHTML(this);
+        alert("Attempting to edit item #" + trailItem.order + "\n" + trailItem.title + "\n" + trailItem.url);
+    });
+}
+
+function getTrailItemFromHTML(item)
+{
+//    console.log($(item).parents('.trail-item'));
+    var trailItem = new TrailItem();
+    trailItem.order = $(item).parents('.trail-item').children('.trail-item-order').text();
+    trailItem.title = $(item).parents('.trail-item').children('.trail-item-link').text();
+    trailItem.url = $(item).parents('.trail-item').children('.trail-item-link').children('a').attr("href");
+//    console.log(trailItem);
+    return trailItem;
+
+}
 
 function displayUserPromptArea(display)
 {
@@ -508,6 +557,7 @@ function loadRecommendations()
                         }
                     }
                 });
+                eventAddRecommendationToMemex();
             });
 }
 
@@ -515,10 +565,22 @@ function addRecommendationItem(trailItem, category)
 {
     var list = "#" + category + "_list ol";
 //    console.log(list);
-    var str = "<li>" + trailItem.parseTrailItemLink() + "</br><p>" + getNiceTime(trailItem.date) + "</p></li>";
+    var str = "<li>" + trailItem.parseTrailItemLink() + "</br><p>" + getNiceTime(trailItem.date) + "</p>";
+    str += "<input class='add-recommendation-to-memex' type='button' value='Add'></li>";
+
     $(list).append(str);
 }
 
+function eventAddRecommendationToMemex()
+{
+    $(".add-recommendation-to-memex").unbind("click");
+    $(".add-recommendation-to-memex").click(function() {
+        var name = $(this).siblings('a').attr("href");
+        var url = $(this).siblings('a').text();
+
+        alert("adding recommendation: " + url);
+    });
+}
 function loadURLImage(url, size)
 {
 //    return IMG_LOAD_URL + "Size=" + size + "&URL=" + url;

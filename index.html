@@ -43,10 +43,10 @@ and open the template in the editor.
             </div>
 
             <div id="user-prompt-area">
-       	    	<form id="create" action="create.html">
-                	<input id="new-trail-name" name='t' type='text' placeholder='Enter new trail name'>
-					<input type="submit" value="Go!">
-				</form>
+                <form id="create" action="create.html">
+                    <input id="new-trail-name" name='t' type='text' placeholder='Enter new trail name'>
+                    <input type="submit" value="Go!">
+                </form>
 
                 </br>   
 
@@ -62,14 +62,28 @@ and open the template in the editor.
 
             <div id="content-area">
                 <div id="memex-area">
+                    <div id='memex-trail-title' class="column-titles">
+                        <h2><label>Trail: </label> <label name='memex-trail-name' id='memex-trail-name'></label></h2>
+                    </div>
+                    <div id="empty-memex-list">
+
+                        <h2>Trail is Empty</h2>
+
+                    </div>
+                    <div id="memex-list">      
+                        <ol>
+                        </ol>
+                    </div>
+                </div>
+                <div id="map-and-recommendations">
                     <div id="memex-input">
                         <form id="memex-form">
                             <div id='memex-trail-title' class="column-titles">
-                                <h2><label>Trail: </label> <label name='memex-trail-name' id='memex-trail-name'></label></h2>
+                                <h2>Add a new link</label></h2>
                             </div>
                             </br>
 
-                            <h2><label>Add a link</label></h2>
+                            <!--<h2><label>Add a link</label></h2>-->
 
                             <input name="memex-form-link" class="memex-form-text" id="memex-form-link" type="text" placeholder="http://">
                             <!--
@@ -90,36 +104,25 @@ and open the template in the editor.
                             </br>
                         </form> 
                     </div>
-                    <div id="empty-memex-list">
-
-                        <h2>Trail is Empty</h2>
-
-                    </div>
-                    <div id="memex-list">      
-                        <ol>
-                        </ol>
-                    </div>
-                </div>
-                <div id="map-and-recommendations">
                     <div id="recommendations">
                         <div id="recommendations-title" class="column-titles">
-                            <h2> <label>We suggest...</label></h2>
+                            <h2> <label> or we suggest...</label></h2>
                         </div>
                         <div id="eat_list" class="recommended-list">
-                             <div class="recommendation-title"><h2>Eat</h2></div>
-          
+                            <div class="recommendation-title"><h2>Eat</h2></div>
+
                             <ol></ol>
                         </div>
                         <div id="see_list" class="recommended-list">
                             <div class="recommendation-title"><h2>See</h2></div>
-          
+
                             <ol>
 
                             </ol>
                         </div>
                         <div id="do_list" class="recommended-list">
-                             <div class="recommendation-title"><h2>Do</h2></div>
-                     
+                            <div class="recommendation-title"><h2>Do</h2></div>
+
                             <ol>
 
                             </ol>
