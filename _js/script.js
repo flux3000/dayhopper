@@ -758,7 +758,7 @@ function eventAddRecommendationToMemex()
     $(".add-recommendation-to-memex").click(function() {
         var name = $(this).siblings('a').attr("href");
         var url = $(this).siblings('a').text();
-
+        var trailName = getTrailNameFromForm();
         // alert("adding recommendation: " + url);
         // get existing tags for this bookmark
         var jqxhr = $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
@@ -768,19 +768,30 @@ function eventAddRecommendationToMemex()
             var tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
             // alert("tags before: " + tags);
 
-            // get current length of trail, add one
-            var newLength = $("#memex-list ol").children().length + 1;
-            tags = tags + "," + getTrailNameFromForm() + "," + getTrailNameFromForm() + "-step" + newLength; 
-            // alert("tags after: " + tags);
-            $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
-                {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
-            )
-            .done (function(data) { 
-                // alert("post/add done");
-            })
-            .fail (function() {
-                alert("post/add failed");
-            });
+            // array of tags
+            var tagArray = tags.split(",")
+            if(tagArray.indexOf(trailName) == -1) {
+                // trailname doesn't yet exist, so we can add it
+
+                // get current length of trail, add one
+                var newLength = $("#memex-list ol").children().length + 1;
+                tags = tags + "," + trailName + "," + trailName + "-step" + newLength; 
+                // alert("tags after: " + tags);
+                $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
+                )
+                .done (function(data) { 
+                    // alert("post/add done");
+                    currentTrailItems.push(createTrailItemFromText(name, url, tags, new Date(), trailName));
+                    reloadMemex();
+                })
+                .fail (function() {
+                    alert("post/add failed");
+                });
+            } else {
+                // trailname is already in taglist
+                alert("link already in trail!");
+            }
         })
         .fail(function() {
             alert("post/get failed");
