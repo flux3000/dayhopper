@@ -45,14 +45,14 @@ and open the template in the editor.
             <div id="user-prompt-area">
                 <form id="create" action="create.html">
                     <input id="new-trail-name" name='t' type='text' placeholder='Enter new trail name'>
-                    <input type="submit" value="Go!">
+                    <button type="button" id="new-trail-button">Submit</button>
                 </form>
 
                 </br>   
 
                 </br>
                 </br>
-                <h2>or choose and existing one...</h2>
+                <h2>or choose an existing one...</h2>
 
                 <ul id="trail-grid">
 
@@ -62,13 +62,11 @@ and open the template in the editor.
 
             <div id="content-area">
                 <div id="memex-area">
-                    <div id='memex-trail-title' class="column-titles">
-                        <h2><label>Trail: </label> <label name='memex-trail-name' id='memex-trail-name'></label></h2>
+                    <div id='memex-trail-title'>
+                        <label for='memex-trail-name'>Trail: </label> <label name='memex-trail-name' id='memex-trail-name'></label></span>
                     </div>
                     <div id="empty-memex-list">
-
-                        <h2>Trail is Empty</h2>
-
+                        This trail is empty. Please use the form on the right to add a link, or choose from our recommendations!
                     </div>
                     <div id="memex-list">      
                         <ol>
@@ -78,7 +76,7 @@ and open the template in the editor.
                 <div id="map-and-recommendations">
                     <div id="memex-input">
                         <form id="memex-form">
-                            <div id='memex-trail-title' class="column-titles">
+                            <div id='add-new-title' class="column-titles">
                                 <h2>Add a new link</label></h2>
                             </div>
                             </br>

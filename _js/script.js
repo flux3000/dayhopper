@@ -31,6 +31,7 @@ function init() {
     updateTrailCountLabel();
     isTrailEmpty();
     loadRecommendations();
+    addNewTrail();
 }
 /** toggle the map view between true and false. Default is true
  * @returns {undefined}
@@ -666,25 +667,6 @@ function eventDeleteTrailItem()
     });
 }
 
-/*
- * renameTag
- *
- *
- *
- * Simple rename of tag, will be useful for re-ordering the steps
- * Currently not working.  Anyone see why?
- 
- 
- function renameTag(old, anew) {
-     $.ajax({
-        type: "POST",
-        url: "delicious_proxy.php",
-        data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
-        }).done(function(msg) {
-        console.log(msg);
-        });
- }
-*/
 
 function eventEditTrailItem()
 {
@@ -776,6 +758,7 @@ function loadURLImage(url, size)
     return IMG_LOAD_URL + url;
 }
 
+/*
 function addTrail () {
 
     //$.getJSON("https://dantsai:npoc3opDL@api.delicious.com/v1/tags/rename?callback=?old=mytrail&new=hahaha",
@@ -846,6 +829,34 @@ function addTrail () {
         event.preventDefault();
     });
 }
+*/
+
+function addNewTrail () {  // called when a user chooses to create a new trail from the first page.
+    $("#new-trail-button").click(function() {
+        alert("added a new trail");
+        var trailname = $("#new-trail-name").val();
+
+        // Tag the new trail name to the Dummy
+
+        var jqxhr = $.get("delicious_proxy.php",
+            {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: "www.tripadvisor.com"}
+        )
+        .done (function(data) {
+            tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
+            var tagarr = tags.split(",");
+            if($.inArray(trailname, tagarr) == -1) {
+                tags = tags + "," + trailname; 
+                // alert("tags after: " + tags);
+                $.get("delicious_proxy.php",
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: "www.tripadvisor.com", tags: tags, replace: 'yes'}
+                );
+            }
+        }); // End update Dummy
+
+        addEventLoadTrailItemsByTrail(trailname)
+
+    });
+}
 
 // Read a page's GET URL variables and return them as an associative array.
 function getUrlVars()
@@ -860,3 +871,24 @@ function getUrlVars()
     }
     return vars;
 }
+
+
+/*
+ * renameTag
+ *
+ *
+ *
+ * Simple rename of tag, will be useful for re-ordering the steps
+ * Currently not working.  Anyone see why?
+ 
+ 
+ function renameTag(old, anew) {
+     $.ajax({
+        type: "POST",
+        url: "delicious_proxy.php",
+        data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "tags/rename", old: old, new : anew}
+        }).done(function(msg) {
+        console.log(msg);
+        });
+ }
+*/
