@@ -208,6 +208,7 @@ function addTrailItemFromForm()
         }
 
     });
+    
 }
 
 
@@ -861,7 +862,7 @@ function addTrail () {
 
                                     // Also tag the new trail name to the Dummy
                                     var jqxhr = $.get(DELICIOUS_PROXY,
-                                            {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/get', url: "www.tripadvisor.com"}
+                                            {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/get', url: "www.dummy.com"}
                                     )
                                             .done(function(data) {
                                                 tags = $(data.xml).contents().attr("tag").replace(/ /g, ",");
@@ -870,7 +871,7 @@ function addTrail () {
                                                     tags = tags + "," + trailname;
                                                     // alert("tags after: " + tags);
                                                     $.get(DELICIOUS_PROXY,
-                                                            {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: "www.tripadvisor.com", tags: tags, replace: 'yes'}
+                                                            {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: "www.dummy.com", tags: tags, replace: 'yes'}
                                                     );
                                                 }
                                             }); // End update Dummy
@@ -895,7 +896,7 @@ function addNewTrail () {  // called when a user chooses to create a new trail f
         // Tag the new trail name to the Dummy
 
         var jqxhr = $.get("delicious_proxy.php",
-            {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: "www.tripadvisor.com"}
+            {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: "www.dummy.com"}
         )
         .done (function(data) {
             tags = $(data.xml).contents().attr("tag").replace(/ /g,",");
@@ -904,7 +905,7 @@ function addNewTrail () {  // called when a user chooses to create a new trail f
                 tags = tags + "," + trailname; 
                 // alert("tags after: " + tags);
                 $.get("delicious_proxy.php",
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: "www.tripadvisor.com", tags: tags, replace: 'yes'}
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: "www.dummy.com", tags: tags, replace: 'yes'}
                 );
             }
         }); // End update Dummy
