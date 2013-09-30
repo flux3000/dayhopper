@@ -42,7 +42,7 @@ input[type=submit]{
     padding:5px;
 }
 #container {
-    width: 1000px;
+    width: 1100px;
     margin: 0px auto;
     border-radius: 0px;
 }
@@ -86,7 +86,7 @@ input[type=submit]{
     line-height: 80px;
     float:left;
     margin:10px;
-    width:200px;
+    width:240px;
     height: 80px;
     padding:5px;
     background-color:#DEEBF7;
@@ -107,7 +107,7 @@ input[type=submit]{
     width:360px;
     padding: 0px;
     float: left;
-    border: 1px solid #DEEBF7;
+    border: 1px solid rgb(182, 189, 192);;
 }
 #memex-input{
     background-color: white;
@@ -125,7 +125,13 @@ input[type=submit]{
 }
 
 #memex-trail-title{
+    font-size: 16pt;
+    padding:10px;
+    margin: 0px 0px;
+    background: rgb(182, 189, 192);
+}
 
+#add-new-title{
     padding:10px;
     margin: 0px;
 }
@@ -140,6 +146,8 @@ input[type=submit]{
 }
 #empty-memex-list{
     display:none;
+    padding: 10px;
+    font-size: 12pt;
 }
 
 .memex-form-text{
@@ -151,7 +159,7 @@ input[type=submit]{
 }
 
 #map-and-recommendations{
-    width:590px;
+    width:690px;
     text-align: center;
     padding:0px;
     margin-left:10px;
@@ -186,7 +194,7 @@ input[type=submit]{
 
 .recommended-list{
     text-align:center;
-    width:194.66666px;
+    width:33%;
     background-color: white;
 
     float:left;
@@ -294,9 +302,28 @@ input[type=submit]{
     z-index: 2;
     position: absolute;
 }
+
 /*.trail-item-link a{
  text-wrap: supress;
 }*/
+
+button#new-trail-button {
+    padding: 1px 3px;
+    margin-bottom: 5px;
+    font-size: 12pt;
+    width: 72px;
+    height: 28px;
+    vertical-align: middle;
+    font-family: 'Ropa Sans', sans-serif;    
+}
+
+input#new-trail-name {
+    height: 24px;
+    width: 248px;
+    font-size: 14pt;
+    font-family: 'Ropa Sans', sans-serif;
+}
+
 .trail-item-order{
 
     z-index: 1;
@@ -311,4 +338,5 @@ input[type=submit]{
 
 /*.trail-item-order:hover{
     opacity:.7;
+
 }*/
