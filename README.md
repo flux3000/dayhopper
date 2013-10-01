@@ -1,18 +1,19 @@
 Project title
+DayHopper
 
 Project description
-With [project title], we have a list of bookmarks of things to do, see, and eat in San Francisco. You can create your own customized, ordered plan for your day. Once your plan is created, you can review it and modify it afterwards as well.
+With DayHopper, you can create your own customized, ordered plan for your day. Once your plan is created, you can review it and modify it afterwards as well. We have already added a number of recommended things to see, eat, and do if you need suggestions!
 
 Team members and roles
-Hassan Jannah
-Dan Tsai
-Ryan Baker
-Shaun Giudici
+Hassan Jannah - did most of the layout and CSS. Also helped with the scripting.
+Dan Tsai - did a bunch of scripting and API work, and also HTML/CSS
+Ryan Baker - JavaScripting
+Shaun Giudici - JavaScripting
 
 Technologies used
 jQuery, HTML, CSS
 
 Link to demo version
-http://dantsai.com/
+http://dantsai.com/dayhopper/
 
 Known bugs
