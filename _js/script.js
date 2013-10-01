@@ -1,7 +1,7 @@
 $(document).ready(function() {
     init();
 });
-var DELICIOUS_PROXY = "http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php";
+var DELICIOUS_PROXY = "delicious_proxy.php";
 var JSON_USERNAME = "dantsai";
 var JSON_PASSWORD = "npoc3opDL";
 var JSON_COUNT_SUFFIX = "?count=100&callback=?";
@@ -775,7 +775,7 @@ function eventAddRecommendationToMemex()
                 tags = tags + "," + trailName + "," + trailName + "-step" + newLength; 
                 // alert("tags after: " + tags);
                 $.get(DELICIOUS_PROXY,
-                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
+                    {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, description: name, tags: tags, replace: 'yes'}
                 )
                 .done (function(data) { 
                     // alert("post/add done");
@@ -825,82 +825,6 @@ function editMemexNode(node, trailItem)
     return false;
 }
 
-function addTrail () {
-
-    //$.getJSON("https://dantsai:npoc3opDL@api.delicious.com/v1/tags/rename?callback=?old=mytrail&new=hahaha",
-    $.getJSON(JSON_READ, function(data) {
-        $.each(data, function(i, item) {
-            var title = item.d;
-            var url = item.u;
-            var date = item.dt;
-            $("#sortable2").append('<li><a href="' + url + '">' + title + '</a> <time>' + getNiceTime(date) + '<time></li>');
-        });
-
-
-        $(".ajax-loader").css("display", "none");
-    });
-
-
-    $("#sortable1, #sortable2").sortable({
-        connectWith: ".connectedSort"
-    }).disableSelection();
-
-
-    $("#createTrail").submit(function(event) {
-        //event.preventDefault();
-
-
-        // iterate through each bookmark in sortable1
-        $("#sortable1").children().each(function(index) {
-            var url = $(this).children().first().attr("href");
-            var trailname = $("#trailName").val();
-            var index2 = index + 1;
-            var tags;
-            // get existing bookmark's tags
-
-
-            var jqxhr = $.get(DELICIOUS_PROXY,
-                    {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/get', url: url}
-            )
-                    .done(function(data) {
-                        tags = $(data.xml).contents().attr("tag").replace(/ /g, ",");
-                        // alert("tags before: " + tags);
-                        tags = tags + "," + trailname + "," + trailname + "-step" + index2;
-                        // alert("tags after: " + tags);
-                        $.get(DELICIOUS_PROXY,
-                                {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: url, tags: tags, replace: 'yes'}
-                        )
-                                .done(function(data) {
-                                    $("#submitStatus").html("updated!");
-
-
-                                    // Also tag the new trail name to the Dummy
-                                    var jqxhr = $.get(DELICIOUS_PROXY,
-                                            {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/get', url: "www.dummy.com"}
-                                    )
-                                            .done(function(data) {
-                                                tags = $(data.xml).contents().attr("tag").replace(/ /g, ",");
-                                                var tagarr = tags.split(",");
-                                                if ($.inArray(trailname, tagarr) === -1) {
-                                                    tags = tags + "," + trailname;
-                                                    // alert("tags after: " + tags);
-                                                    $.get(DELICIOUS_PROXY,
-                                                            {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: "www.dummy.com", tags: tags, replace: 'yes'}
-                                                    );
-                                                }
-                                            }); // End update Dummy
-                                })
-                                .fail(function() {
-                                    alert("post/add failed");
-                                });
-                    })
-                    .fail(function() {
-                        alert("post/get failed");
-                    });
-        });
-        event.preventDefault();
-    });
-}
 
 function addNewTrail () {  // called when a user chooses to create a new trail from the first page.
     $("#new-trail-button").click(function() {
