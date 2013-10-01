@@ -38,7 +38,7 @@ and open the template in the editor.
 
         <div id="container">
             <div id="page-header">
-                <div id="title"><h1><a href="index.html">DayHopper</a><label id="count-label" ></label></h1></div>
+                <div id="title"><h1><a href="index.html">DayHopper</a></h1></div>
 
             </div>
 
@@ -78,36 +78,22 @@ and open the template in the editor.
                     <div id="memex-input">
                         <form id="memex-form">
                             <div id='add-new-title' class="column-titles">
-                                <h2>Add a new link</label></h2>
+                                Add a new link
                             </div>
                             </br>
-
-                            <!--<h2><label>Add a link</label></h2>-->
-
-                            <input name="memex-form-link" class="memex-form-text" id="memex-form-link" type="text" placeholder="http://">
+                            <input name="memex-form-link" class="memex-form-link" id="memex-form-link" type="text" placeholder="http://">
                             <input name="memex-form-link-title" class="memex-form-text" id="memex-form-link-title" type="text" placeholder="link title">
-                            <!--
-                             <h2>Select Category</h2>
- 
- 
-                             <div id="category-radio">
-                                 <input type="radio" name="cat-group" value="Eat" title="Eat" checked> Eat
-                                 <input type="radio" name="cat-group" value="See" title="See"> See
-                                 <input type="radio" name="cat-group" value="Do" title="Do"> Do
-                             </div>
-                            -->
+                            <br>
+                            <input name="memex-form-tags" class="memex-form-tags" id="memex-form-tags" type="text" placeholder="Enter comma separated tags">
+                            <button type="button" id="new-link-button">Add Link</button>
+                            <!--<input id="submit_button" type="submit" value="Add Link">-->
 
-                            <h2>Add Tags</h2>
-
-                            <input name="memex-form-tags" class="memex-form-text" id="memex-form-tags" type="text"placeholder="Enter comma seperated tags">
-
-                            <input id="submit_button" type="submit" value="Add Link">
                             </br>
                         </form> 
                     </div>
                     <div id="recommendations">
                         <div id="recommendations-title" class="column-titles">
-                            <h2> <label> or we suggest...</label></h2>
+                            Or may we suggest...
                         </div>
                         <div id="eat_list" class="recommended-list">
                             <div class="recommendation-title"><h2>Eat</h2></div>
@@ -118,7 +104,6 @@ and open the template in the editor.
                             <div class="recommendation-title"><h2>See</h2></div>
 
                             <ol>
-
                             </ol>
                         </div>
                         <div id="do_list" class="recommended-list">

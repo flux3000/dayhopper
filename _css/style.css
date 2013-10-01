@@ -7,7 +7,7 @@ body {
 }
 
 #title {
-        font-size: 24pt;
+        font-size: 32pt;
         font-weight: bold;
         padding: 12px;
 }
@@ -60,7 +60,7 @@ input[type=submit]{
 }
 #title h1 a {
     color: #FFC000;
-    font-size: xx-large;
+    font-size: 32pt;
     text-decoration: none;
 
 }
@@ -118,10 +118,9 @@ input[type=submit]{
 
 #memex-form{
 
-
-    padding: 0px  10px 10px 10px;
-
-    background-color: #DEEBF7;
+    padding-bottom: 10px;
+    background-color: #F3F3EE;
+    border: 1px solid #d2cdc3;
 
 }
 
@@ -151,12 +150,24 @@ input[type=submit]{
     font-size: 12pt;
 }
 
-.memex-form-text{
-    width:90%;
-
+.memex-form-link{
+    width:300px;
     height:30px;
     margin-bottom:10px;
-    display:block-inline
+    display:block-inline;
+    font-size: 14pt;
+    font-family: 'Ropa Sans', sans-serif;
+    padding-left: 4px;
+}
+.memex-form-tags{
+    width:250px;
+    height:30px;
+    margin-bottom:10px;
+    display:block-inline;
+    font-size: 14pt;
+    font-family: 'Ropa Sans', sans-serif;
+    padding-left: 4px;
+
 }
 
 #map-and-recommendations{
@@ -177,13 +188,14 @@ input[type=submit]{
 }
 
 .column-titles{
-    background-color:#5B9BD5;
+    font-size: 14pt;
+    background-color: rgb(182, 167, 139);
     color:white;
     padding:5px 0px;
 }
 
 .recommendation-title{
-    background-color:#DEEBF7;
+    background-color: rgb(226, 226, 226);
     color:black;
     padding:5px 0px;
 }
@@ -199,7 +211,7 @@ input[type=submit]{
     background-color: white;
 
     float:left;
-    border: 1px solid #DEEBF7;
+    border: 1px solid #d2cdc3;
     height: 100%;
 }
 
@@ -322,6 +334,15 @@ button#new-trail-button {
     font-family: 'Ropa Sans', sans-serif;    
 }
 
+button#new-link-button {
+    padding: 1px 3px;
+    font-size: 12pt;
+    width: 72px;
+    height: 28px;
+    vertical-align: middle;
+    font-family: 'Ropa Sans', sans-serif;    
+}
+
 input#new-trail-name {
     height: 24px;
     width: 248px;
@@ -333,10 +354,9 @@ input#new-trail-name {
     display: none;
     z-index: 1;
     position:absolute;
-    text-align: center;
-    font-size: 36pt;
-    width:360px;
-
+    text-align: right;
+    font-size: 50pt;
+    width:340px;
     opacity:.1;
     color: #4472C4
 }

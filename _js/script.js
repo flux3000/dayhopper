@@ -190,7 +190,7 @@ function createTrailItemFromText(title, url, tags, date, trailName) {
  */
 function addTrailItemFromForm()
 {
-    $("#submit_button").click(function() {
+    $("#new-link-button").click(function() {
         try {
             var trailName = getTrailNameFromForm();
             var newLength = $("#memex-list ol").children().length + 1;
@@ -212,7 +212,7 @@ function addTrailItemFromForm()
         }
 
     });
-    
+
 }
 
 
@@ -337,6 +337,7 @@ function getTrailSize() {
  * Update the count label in the page title
  * @returns {undefined}
  */
+/* 
 function updateTrailCountLabel() {
     var size = getTrailSize();
     var txt = "";
@@ -344,7 +345,7 @@ function updateTrailCountLabel() {
         txt = "(" + size + ")";
     }
     $("#count-label").text(txt);
-}
+}*/
 /**
  * Load the list of Trails from dummy link
  * @param {boolean} updateHTML if true insert the trail to the trai-grid
