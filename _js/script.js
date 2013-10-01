@@ -197,11 +197,7 @@ function addTrailItemFromForm()
             var trailItem = createTrailItemFromText($("#memex-form-link-title").val(), $("#memex-form-link").val(), $("#memex-form-tags").val() + "," + trailName + "," + trailName + "-step" + newLength, new Date(), trailName);
 
             addLink(trailItem.url, trailItem.trailName, trailItem.tags, $("#memex-form-link-title").val());
-//            addTrailItemToMemex(trailItem);
-//            console.log("submit clicked");
-//            var url = $("#memex-form-link").text();
 
-//            console.log(trailName + "\t" + trailItem.url + "\n" + trailItem.tags);
             currentTrailItems.push(trailItem);
             reloadMemex();
             return false;
@@ -228,7 +224,7 @@ function addLink(url, trailName, inputTags, description) {
                 var jqxhr = $.post(DELICIOUS_PROXY,
                         {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: url, tags: inputTags.join(","), description: description, replace: 'yes'})
                         .done(function(msg) {
-                            alert("yes");
+                            console.log("new link added");
                         })
                         .fail(function() {
                             alert("error");
