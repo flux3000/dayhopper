@@ -39,21 +39,16 @@ and open the template in the editor.
         <div id="container">
             <div id="page-header">
                 <div id="title"><h1><a href="index.html">DayHopper</a></h1></div>
-
             </div>
 
             <div id="user-prompt-area">
+                <div class="header-text">Create a new path</div></br>
                 <form id="create" action="create.html">
-                    <input id="new-trail-name" name='t' type='text' placeholder='Create a new path'>
-                    <button type="button" id="new-trail-button">Submit</button>
+                    <input id="new-trail-name" name='t' type='text' placeholder='Enter Path Name'>
+                    <button type="button" id="new-trail-button" type="button">Submit</button>
                 </form>
-
-                </br>   
-
                 </br>
-                </br>
-                <h2>or choose an existing one...</h2>
-
+                <div class="header-text">Or choose an existing one...</div>
                 <ul id="trail-grid">
 
                 </ul>
@@ -78,14 +73,14 @@ and open the template in the editor.
                     <div id="memex-input">
                         <form id="memex-form">
                             <div id='add-new-title' class="column-titles">
-                                Add a new link
+                                Add a new link to the path
                             </div>
                             </br>
                             <input name="memex-form-link" class="memex-form-link" id="memex-form-link" type="text" placeholder="http://">
                             <input name="memex-form-link-title" class="memex-form-text" id="memex-form-link-title" type="text" placeholder="link title">
                             <br>
                             <input name="memex-form-tags" class="memex-form-tags" id="memex-form-tags" type="text" placeholder="Enter comma separated tags">
-                            <button type="button" id="new-link-button">Add Link</button>
+                            <button type="button" id="new-link-button" type="button">Add Link</button>
                             <!--<input id="submit_button" type="submit" value="Add Link">-->
 
                             </br>
@@ -93,7 +88,7 @@ and open the template in the editor.
                     </div>
                     <div id="recommendations">
                         <div id="recommendations-title" class="column-titles">
-                            Or may we suggest...
+                            Or may we suggest one of these...
                         </div>
                         <div id="eat_list" class="recommended-list">
                             <div class="recommendation-title"><h2>Eat</h2></div>

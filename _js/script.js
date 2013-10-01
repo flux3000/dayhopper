@@ -95,9 +95,9 @@ function formatTrailItemHTML() {
 
     item += "<div class='trail-item-menu'><ul>";
     // item += "<li class='trail-item-edit'>&#9998;</li>";
+    item += "<li class='trail-item-delete'>&#9587;</li>";
     item += "<li class='trail-item-up'>&#9650;</li>";
     item += "<li class='trail-item-down'>&#9660;</li>";
-    item += "<li class='trail-item-delete'>&#9587;</li>";
     item += "</ul></div>";
     item += "<div class='trail-item-order' value='" + this.order + "'>" + this.order + "</div>";
     item += "<div class='trail-item-link'>" + this.parseTrailItemLink() + "</div>";
@@ -135,6 +135,13 @@ function isMetaTag(tag)
     }
     return false;
 }
+
+function isValidUrl(link) {
+
+
+
+}
+
 
 function getTrailNameFromForm()
 {
@@ -193,6 +200,13 @@ function addTrailItemFromForm()
         try {
             var trailName = getTrailNameFromForm();
             var newLength = $("#memex-list ol").children().length + 1;
+
+            /*
+            var newURL = $("#memex-form-link-title").val();
+            if !((newURL.substring(0, 6) == "http://") || (newURL.substring(0, 7) == "https://")) {
+                newURL = "http://" + newURL;
+            }
+            */
             var trailItem = createTrailItemFromText($("#memex-form-link-title").val(), $("#memex-form-link").val(), $("#memex-form-tags").val() + "," + trailName + "," + trailName + "-step" + newLength, new Date(), trailName);
 
             addLink(trailItem.url, trailItem.trailName, trailItem.tags, $("#memex-form-link-title").val());
@@ -733,9 +747,8 @@ function loadRecommendations()
 function addRecommendationItem(trailItem, category)
 {
     var list = "#" + category + "_list ol";
-//    console.log(list);
     var str = "<li>" + trailItem.parseTrailItemLink() + "</br><p>" + getNiceTime(trailItem.date) + "</p>";
-    str += "<input class='add-recommendation-to-memex' type='button' value='Add'></li>";
+    str += "<button class='add-recommendation-to-memex' type='button'>Add to Path</button></li>";
     $(list).append(str);
 }
 
@@ -894,7 +907,7 @@ function addTrail () {
 
 function addNewTrail () {  // called when a user chooses to create a new trail from the first page.
     $("#new-trail-button").click(function() {
-        alert("added a new trail");
+        //alert("added a new trail");
         var trailname = $("#new-trail-name").val();
 
         // Tag the new trail name to the Dummy

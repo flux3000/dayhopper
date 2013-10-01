@@ -55,7 +55,6 @@ input[type=submit]{
     width:100%;
     text-align: center;
     padding: 30px 0px;
-    margin-bottom: 30px;
     background-color: #44546A;
 }
 #title h1 a {
@@ -67,9 +66,8 @@ input[type=submit]{
 #user-prompt-area{
     display:block;
     background-color:white;
-    padding:40px;
+    padding:24px;
     text-align: center;
-    margin:10px 0px;
 }
 #trail-grid{
     display:inline-block;
@@ -78,16 +76,14 @@ input[type=submit]{
 
 #trail-grid li{
 
-
-
-    font-size: large;
+    font-size: 18pt;
     display: table-cell; 
     vertical-align: middle; 
     text-align: center; 
     line-height: 80px;
     float:left;
     margin:10px;
-    width:240px;
+    width:220px;
     height: 80px;
     padding:5px;
     background-color:#DEEBF7;
@@ -185,6 +181,12 @@ input[type=submit]{
     width: 550px;
     display: inline-block;
     float: none;
+}
+
+.header-text {
+    font-size: 16pt;
+    font-weight: bold;
+    padding: 8px 0px;
 }
 
 .column-titles{
@@ -339,6 +341,15 @@ button#new-link-button {
     font-size: 12pt;
     width: 72px;
     height: 28px;
+    vertical-align: middle;
+    font-family: 'Ropa Sans', sans-serif;    
+}
+
+button.add-recommendation-to-memex {
+    padding: 2px 3px;
+    font-size: 10pt;
+    width: 40px;
+    height: 18px;
     vertical-align: middle;
     font-family: 'Ropa Sans', sans-serif;    
 }
