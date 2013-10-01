@@ -117,9 +117,7 @@ input[type=submit]{
 
 #memex-form{
 
-
-    padding: 0px  10px 10px 10px;
-
+    padding-bottom: 10px;
     background-color: #DEEBF7;
 
 }
@@ -150,12 +148,24 @@ input[type=submit]{
     font-size: 12pt;
 }
 
-.memex-form-text{
-    width:90%;
-
+.memex-form-link{
+    width:300px;
     height:30px;
     margin-bottom:10px;
-    display:block-inline
+    display:block-inline;
+    font-size: 14pt;
+    font-family: 'Ropa Sans', sans-serif;
+    padding-left: 4px;
+}
+.memex-form-tags{
+    width:250px;
+    height:30px;
+    margin-bottom:10px;
+    display:block-inline;
+    font-size: 14pt;
+    font-family: 'Ropa Sans', sans-serif;
+    padding-left: 4px;
+
 }
 
 #map-and-recommendations{
@@ -176,6 +186,7 @@ input[type=submit]{
 }
 
 .column-titles{
+    font-size: 14pt;
     background-color:#5B9BD5;
     color:white;
     padding:5px 0px;
@@ -318,6 +329,15 @@ button#new-trail-button {
     font-family: 'Ropa Sans', sans-serif;    
 }
 
+button#new-link-button {
+    padding: 1px 3px;
+    font-size: 12pt;
+    width: 72px;
+    height: 28px;
+    vertical-align: middle;
+    font-family: 'Ropa Sans', sans-serif;    
+}
+
 input#new-trail-name {
     height: 24px;
     width: 248px;
@@ -329,10 +349,9 @@ input#new-trail-name {
 
     z-index: 1;
     position:absolute;
-    text-align: center;
-    font-size: 80pt;
-    width:360px;
-
+    text-align: right;
+    font-size: 64pt;
+    width:340px;
     opacity:.1;
     color: #4472C4
 }

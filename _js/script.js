@@ -189,7 +189,7 @@ function createTrailItemFromText(title, url, tags, date, trailName) {
  */
 function addTrailItemFromForm()
 {
-    $("#submit_button").click(function() {
+    $("#new-link-button").click(function() {
         try {
             var trailName = getTrailNameFromForm();
             var trailItem = createTrailItemFromText("", $("#memex-form-link").val(), $("#memex-form-tags").val(), new Date(), trailName);
@@ -208,7 +208,7 @@ function addTrailItemFromForm()
         }
 
     });
-    
+
 }
 
 
