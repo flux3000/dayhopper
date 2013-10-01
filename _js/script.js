@@ -170,6 +170,7 @@ function createTrailItemFromText(title, url, tags, date, trailName) {
         trailItem.trailName = trailName;
         trailItem.tags.push(trailName);
     }
+    trailItem.trailName = trailName;
     if (typeof date === 'undefined')
         trailItem.date = new Date();
     else
@@ -215,35 +216,45 @@ function addTrailItemFromForm()
 }
 
 
-function addLink(url, trailName, tags, description) {
+function addLink(url, trailName, inputTags, description) {
 //    console.log("Adding link");
-    $.getJSON(JSON_EDIT + trailName + "?callback=?",
-            {},
-            function(data) {
-                // next is the next Step # for this Path
-                var next = data.length;
-                var trailNameStep = trailName + "-step" + next;
-                $.ajax({
-                    type: "POST",
-                    url: DELICIOUS_PROXY,
-                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, description: description, tags: trailNameStep + "," + tags, replace: "yes"}
-                }).done(function(msg) {
-                    console.log("DONE");
-                    console.log(msg);
-                    var result_code = msg.result_code;
-                    console.log("RESULT:" + result_code);
-                    if (result_code === RESULT_ITEM_EXIST_MSG)
-                    {
-                        alert(RESULT_ITEM_EXIST_MSG);
-                    }
-                    if (result_code === "done")
-                    {
-                        getTrailItemsFromDelicious(trailNameStep, true);
-                    }
+    // $.getJSON(JSON_EDIT + trailName + "?callback=?",
+    //         {},
+    //         function(data) {
+    //             // next is the next Step # for this Path
+    //             var next = data.length;
+    //             var trailNameStep = trailName + "-step" + next;
+
+                var jqxhr = $.post(DELICIOUS_PROXY,
+                        {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: url, tags: inputTags.join(","), description: description, replace: 'yes'})
+                        .done(function(msg) {
+                            alert("yes");
+                        })
+                        .fail(function() {
+                            alert("error");
+                        });
+
+                // $.ajax({
+                //     type: "GET",
+                //     url: DELICIOUS_PROXY,
+                //     data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, description: description, tags: inputTags, replace: "yes"}
+                // }).done(function(msg) {
+                //     console.log("DONE");
+                //     console.log(msg);
+                //     var result_code = msg.result_code;
+                //     console.log("RESULT:" + result_code);
+                //     if (result_code === RESULT_ITEM_EXIST_MSG)
+                //     {
+                //         alert(RESULT_ITEM_EXIST_MSG);
+                //     }
+                //     if (result_code === "done")
+                //     {
+                //         getTrailItemsFromDelicious(trailNameStep, true);
+                //     }
 
 
-                });
-            });
+                // });
+            // });
 }
 
 //
@@ -733,8 +744,8 @@ function addRecommendationItem(trailItem, category)
 {
     var list = "#" + category + "_list ol";
 //    console.log(list);
-    var str = "<li>" + trailItem.parseTrailItemLink() + "</br><p>" + getNiceTime(trailItem.date) + "</p>";
-    str += "<input class='add-recommendation-to-memex' type='button' value='Add'></li>";
+    var str = "<li>" + trailItem.parseTrailItemLink();
+    str += " <input class='add-recommendation-to-memex' type='button' value='Add'></li>";
     $(list).append(str);
 }
 
@@ -742,12 +753,12 @@ function eventAddRecommendationToMemex()
 {
     $(".add-recommendation-to-memex").unbind("click");
     $(".add-recommendation-to-memex").click(function() {
-        var name = $(this).siblings('a').attr("href");
-        var url = $(this).siblings('a').text();
+        var url = $(this).siblings('a').attr("href");
+        var name = $(this).siblings('a').text();
         var trailName = getTrailNameFromForm();
         // alert("adding recommendation: " + url);
         // get existing tags for this bookmark
-        var jqxhr = $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+        var jqxhr = $.get(DELICIOUS_PROXY,
             {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: url}
         )
         .done (function(data) {
@@ -763,7 +774,7 @@ function eventAddRecommendationToMemex()
                 var newLength = $("#memex-list ol").children().length + 1;
                 tags = tags + "," + trailName + "," + trailName + "-step" + newLength; 
                 // alert("tags after: " + tags);
-                $.get("http://people.ischool.berkeley.edu/~dantsai/iolab/lecture7/delicious_proxy.php",
+                $.get(DELICIOUS_PROXY,
                     {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, tags: tags, replace: 'yes'}
                 )
                 .done (function(data) { 
@@ -898,7 +909,7 @@ function addNewTrail () {  // called when a user chooses to create a new trail f
 
         // Tag the new trail name to the Dummy
 
-        var jqxhr = $.get("delicious_proxy.php",
+        var jqxhr = $.get(DELICIOUS_PROXY,
             {username: 'dantsai', password: 'npoc3opDL', method: 'posts/get', url: "www.dummy.com"}
         )
         .done (function(data) {
@@ -907,7 +918,7 @@ function addNewTrail () {  // called when a user chooses to create a new trail f
             if($.inArray(trailname, tagarr) == -1) {
                 tags = tags + "," + trailname; 
                 // alert("tags after: " + tags);
-                $.get("delicious_proxy.php",
+                $.get(DELICIOUS_PROXY,
                     {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: "www.dummy.com", tags: tags, replace: 'yes'}
                 );
             }
