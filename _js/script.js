@@ -27,7 +27,7 @@ function init() {
     displayContentArea(false);
     getTrailListFromDelicious(true);
     addTrailItemFromForm();
-    updateTrailCountLabel();
+    // updateTrailCountLabel();
     isTrailEmpty();
     loadRecommendations();
     addNewTrail();
@@ -94,10 +94,10 @@ function formatTrailItemHTML() {
 
 
     item += "<div class='trail-item-menu'><ul>";
-    item += "<li class='trail-item-edit'>&#9998;</li>";
-    item += "<li class='trail-item-delete'>&#9587;</li>";
+    // item += "<li class='trail-item-edit'>&#9998;</li>";
     item += "<li class='trail-item-up'>&#9650;</li>";
     item += "<li class='trail-item-down'>&#9660;</li>";
+    item += "<li class='trail-item-delete'>&#9587;</li>";
     item += "</ul></div>";
     item += "<div class='trail-item-order' value='" + this.order + "'>" + this.order + "</div>";
     item += "<div class='trail-item-link'>" + this.parseTrailItemLink() + "</div>";
@@ -292,7 +292,7 @@ function addTrailItemToMemex(trailItem)
     $("#empty-memex-list").css("display", "none");
     addEventsToTrailItemMenu();
     /*removeItem();*/
-    updateTrailCountLabel();
+    // updateTrailCountLabel();
     // console.log(currentTrailItems);
     return false;
 }
