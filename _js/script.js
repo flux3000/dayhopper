@@ -195,7 +195,7 @@ function addTrailItemFromForm()
             var newLength = $("#memex-list ol").children().length + 1;
             var trailItem = createTrailItemFromText($("#memex-form-link-title").val(), $("#memex-form-link").val(), $("#memex-form-tags").val() + "," + trailName + "," + trailName + "-step" + newLength, new Date(), trailName);
 
-            addLink(trailItem.url, trailItem.trailName, trailItem.tags);
+            addLink(trailItem.url, trailItem.trailName, trailItem.tags, $("#memex-form-link-title").val());
 //            addTrailItemToMemex(trailItem);
 //            console.log("submit clicked");
 //            var url = $("#memex-form-link").text();
@@ -215,7 +215,7 @@ function addTrailItemFromForm()
 }
 
 
-function addLink(url, trailName, tags) {
+function addLink(url, trailName, tags, description) {
 //    console.log("Adding link");
     $.getJSON(JSON_EDIT + trailName + "?callback=?",
             {},
@@ -226,7 +226,7 @@ function addLink(url, trailName, tags) {
                 $.ajax({
                     type: "POST",
                     url: DELICIOUS_PROXY,
-                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, tags: trailNameStep + "," + tags, replace: "yes"}
+                    data: {username: JSON_USERNAME, password: JSON_PASSWORD, method: "posts/add", url: url, description: description, tags: trailNameStep + "," + tags, replace: "yes"}
                 }).done(function(msg) {
                     console.log("DONE");
                     console.log(msg);
