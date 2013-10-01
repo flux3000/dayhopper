@@ -6,7 +6,7 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>The Memex</title>
+        <title>DayHopper</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width">
         <!-- link to css file -->
@@ -38,13 +38,13 @@ and open the template in the editor.
 
         <div id="container">
             <div id="page-header">
-                <div id="title"><h1><a href="index.html">The Memex</a><label id="count-label" ></label></h1></div>
+                <div id="title"><h1><a href="index.html">DayHopper</a></h1></div>
 
             </div>
 
             <div id="user-prompt-area">
                 <form id="create" action="create.html">
-                    <input id="new-trail-name" name='t' type='text' placeholder='Enter new trail name'>
+                    <input id="new-trail-name" name='t' type='text' placeholder='Create a new path'>
                     <button type="button" id="new-trail-button">Submit</button>
                 </form>
 
@@ -63,11 +63,11 @@ and open the template in the editor.
             <div id="content-area">
                 <div id="memex-area">
                     <div id='memex-trail-title'>
-                        <label for='memex-trail-name'>Trail: </label> <label name='memex-trail-name' id='memex-trail-name'></label></span>
+                        <label for='memex-trail-name'>Path name: </label> <label name='memex-trail-name' id='memex-trail-name'></label></span>
                         <br><span style="font-size:10pt;font-weight:normal;"><input id='show-meta-tags-link' type='checkbox'>Show Meta Tags</span>
                     </div>
                     <div id="empty-memex-list">
-                        This trail is empty. Please use the form on the right to add a link, or choose from our recommendations!
+                        This path is empty. Please use the form on the right to add a link, or choose from our recommendations!
                     </div>
                     <div id="memex-list">      
                         <ol>
@@ -82,9 +82,12 @@ and open the template in the editor.
                             </div>
                             </br>
                             <input name="memex-form-link" class="memex-form-link" id="memex-form-link" type="text" placeholder="http://">
+                            <input name="memex-form-link-title" class="memex-form-text" id="memex-form-link-title" type="text" placeholder="link title">
+                            <br>
                             <input name="memex-form-tags" class="memex-form-tags" id="memex-form-tags" type="text" placeholder="Enter comma separated tags">
                             <button type="button" id="new-link-button">Add Link</button>
                             <!--<input id="submit_button" type="submit" value="Add Link">-->
+
                             </br>
                         </form> 
                     </div>
@@ -101,7 +104,6 @@ and open the template in the editor.
                             <div class="recommendation-title"><h2>See</h2></div>
 
                             <ol>
-
                             </ol>
                         </div>
                         <div id="do_list" class="recommended-list">

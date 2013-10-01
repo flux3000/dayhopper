@@ -27,7 +27,7 @@ function init() {
     displayContentArea(false);
     getTrailListFromDelicious(true);
     addTrailItemFromForm();
-    updateTrailCountLabel();
+    // updateTrailCountLabel();
     isTrailEmpty();
     loadRecommendations();
     addNewTrail();
@@ -94,10 +94,10 @@ function formatTrailItemHTML() {
 
 
     item += "<div class='trail-item-menu'><ul>";
-    item += "<li class='trail-item-edit'>&#9998;</li>";
-    item += "<li class='trail-item-delete'>&#9587;</li>";
+    // item += "<li class='trail-item-edit'>&#9998;</li>";
     item += "<li class='trail-item-up'>&#9650;</li>";
     item += "<li class='trail-item-down'>&#9660;</li>";
+    item += "<li class='trail-item-delete'>&#9587;</li>";
     item += "</ul></div>";
     item += "<div class='trail-item-order' value='" + this.order + "'>" + this.order + "</div>";
     item += "<div class='trail-item-link'>" + this.parseTrailItemLink() + "</div>";
@@ -192,7 +192,8 @@ function addTrailItemFromForm()
     $("#new-link-button").click(function() {
         try {
             var trailName = getTrailNameFromForm();
-            var trailItem = createTrailItemFromText("", $("#memex-form-link").val(), $("#memex-form-tags").val(), new Date(), trailName);
+            var newLength = $("#memex-list ol").children().length + 1;
+            var trailItem = createTrailItemFromText($("#memex-form-link-title").val(), $("#memex-form-link").val(), $("#memex-form-tags").val() + "," + trailName + "," + trailName + "-step" + newLength, new Date(), trailName);
 
             addLink(trailItem.url, trailItem.trailName, trailItem.tags);
 //            addTrailItemToMemex(trailItem);
@@ -200,6 +201,8 @@ function addTrailItemFromForm()
 //            var url = $("#memex-form-link").text();
 
 //            console.log(trailName + "\t" + trailItem.url + "\n" + trailItem.tags);
+            currentTrailItems.push(trailItem);
+            reloadMemex();
             return false;
         } catch (err) {
 
@@ -292,7 +295,7 @@ function addTrailItemToMemex(trailItem)
     $("#empty-memex-list").css("display", "none");
     addEventsToTrailItemMenu();
     /*removeItem();*/
-    updateTrailCountLabel();
+    // updateTrailCountLabel();
     // console.log(currentTrailItems);
     return false;
 }
@@ -323,6 +326,7 @@ function getTrailSize() {
  * Update the count label in the page title
  * @returns {undefined}
  */
+/* 
 function updateTrailCountLabel() {
     var size = getTrailSize();
     var txt = "";
@@ -330,7 +334,7 @@ function updateTrailCountLabel() {
         txt = "(" + size + ")";
     }
     $("#count-label").text(txt);
-}
+}*/
 /**
  * Load the list of Trails from dummy link
  * @param {boolean} updateHTML if true insert the trail to the trai-grid

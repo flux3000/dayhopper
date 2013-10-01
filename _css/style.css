@@ -7,7 +7,7 @@ body {
 }
 
 #title {
-        font-size: 24pt;
+        font-size: 32pt;
         font-weight: bold;
         padding: 12px;
 }
@@ -54,19 +54,20 @@ input[type=submit]{
 #title{
     width:100%;
     text-align: center;
-    padding:10px 0px;
+    padding: 30px 0px;
+    margin-bottom: 30px;
     background-color: #44546A;
 }
 #title h1 a {
     color: #FFC000;
-    font-size: xx-large;
+    font-size: 32pt;
     text-decoration: none;
 
 }
 #user-prompt-area{
     display:block;
     background-color:white;
-    padding:10px;
+    padding:40px;
     text-align: center;
     margin:10px 0px;
 }
@@ -118,7 +119,8 @@ input[type=submit]{
 #memex-form{
 
     padding-bottom: 10px;
-    background-color: #DEEBF7;
+    background-color: #F3F3EE;
+    border: 1px solid #d2cdc3;
 
 }
 
@@ -187,13 +189,13 @@ input[type=submit]{
 
 .column-titles{
     font-size: 14pt;
-    background-color:#5B9BD5;
+    background-color: rgb(182, 167, 139);
     color:white;
     padding:5px 0px;
 }
 
 .recommendation-title{
-    background-color:#DEEBF7;
+    background-color: rgb(226, 226, 226);
     color:black;
     padding:5px 0px;
 }
@@ -209,7 +211,7 @@ input[type=submit]{
     background-color: white;
 
     float:left;
-    border: 1px solid #DEEBF7;
+    border: 1px solid #d2cdc3;
     height: 100%;
 }
 
@@ -277,6 +279,8 @@ input[type=submit]{
 
     background-color: #DEEBF7;
     margin-right:5px;
+    margin-top: 10px;
+    margin-left: 5px;
     padding:5px;
     font-size: small;
     z-index:2;
@@ -312,6 +316,7 @@ input[type=submit]{
     word-break: break-all;
     float: left;
     z-index: 2;
+    margin: 5px;
     position: absolute;
 }
 
@@ -346,11 +351,11 @@ input#new-trail-name {
 }
 
 .trail-item-order{
-
+    display: none;
     z-index: 1;
     position:absolute;
     text-align: right;
-    font-size: 64pt;
+    font-size: 50pt;
     width:340px;
     opacity:.1;
     color: #4472C4
