@@ -192,7 +192,8 @@ function addTrailItemFromForm()
     $("#submit_button").click(function() {
         try {
             var trailName = getTrailNameFromForm();
-            var trailItem = createTrailItemFromText("", $("#memex-form-link").val(), $("#memex-form-tags").val(), new Date(), trailName);
+            var newLength = $("#memex-list ol").children().length + 1;
+            var trailItem = createTrailItemFromText($("#memex-form-link-title").val(), $("#memex-form-link").val(), $("#memex-form-tags").val() + "," + trailName + "," + trailName + "-step" + newLength, new Date(), trailName);
 
             addLink(trailItem.url, trailItem.trailName, trailItem.tags);
 //            addTrailItemToMemex(trailItem);
@@ -200,6 +201,8 @@ function addTrailItemFromForm()
 //            var url = $("#memex-form-link").text();
 
 //            console.log(trailName + "\t" + trailItem.url + "\n" + trailItem.tags);
+            currentTrailItems.push(trailItem);
+            reloadMemex();
             return false;
         } catch (err) {
 
