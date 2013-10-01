@@ -293,7 +293,8 @@ input[type=submit]{
 .trail-item-menu li:hover{
     color:white;
     background-color: #4472C4;
-
+    cursor: pointer;
+    cursor: hand;
 }
 .trail-item-link{
     width:310px;
