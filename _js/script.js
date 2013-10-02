@@ -9,6 +9,7 @@ var JSON_ROOT = "http://feeds.delicious.com/v2/json/dantsai";
 var JSON_DUMMY = JSON_ROOT + "/Dummy" + JSON_COUNT_SUFFIX;
 var JSON_READ = JSON_ROOT + JSON_COUNT_SUFFIX;
 var JSON_EDIT = JSON_ROOT + "/";
+var DUMMY_URL = "dummytrail.com";
 var RESULT_ITEM_EXIST_MSG = "item already exists";
 //var IMG_LOAD_URL = "http://immediatenet.com/t/m?";
 //var IMG_LOAD_URL = "http://wimg.ca/";
@@ -253,7 +254,7 @@ function addLink(url, trailName, inputTags, description, stepTag) {
             {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: url, tags: inputTags.join(","), description: description, replace: 'yes'})
             .done(function(msg) {
                 console.log("new link added");
-                 $("#memex-form").find("input[type=text], textarea").val("");
+                $("#memex-form").find("input[type=text], textarea").val("");
             })
             .fail(function() {
                 alert("error");
@@ -735,7 +736,7 @@ function eventAddRecommendationToMemex()
                         tags = tags + "," + trailName + "," + trailName + "-step" + newLength;
                         // alert("tags after: " + tags);
                         $.get(DELICIOUS_PROXY,
-                                {username: 'dantsai', password: 'npoc3opDL', method: 'posts/add', url: url, description: name, tags: tags, replace: 'yes'}
+                                {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: url, description: name, tags: tags, replace: 'yes'}
                         )
                                 .done(function(data) {
                                     // alert("post/add done");
@@ -850,23 +851,42 @@ function addNewTrail() {  // called when a user chooses to create a new trail fr
         var trailName = $("#new-trail-name").val();
         //Check for trail name spaces
         trailName = trailName.replace(" ", "_");
+
+        var tags = "Dummy,";
+
+        for (var i in allTrails) {
+            if (allTrails[i] !== trailName)
+                tags += allTrails[i] + ",";
+            else
+                alert(trailName + " trail already exists")
+        }
+        tags += trailName;
+        $.get(DELICIOUS_PROXY,
+                {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: DUMMY_URL, tags: tags, replace: 'yes'}
+        );
         // Tag the new trail name to the Dummy
-
-        var jqxhr = $.get(DELICIOUS_PROXY,
-                {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/get', url: "www.dummy.com"}
-        )
-                .done(function(data) {
-                    tags = $(data.xml).contents().attr("tag").replace(/ /g, ",");
-                    var tagarr = tags.split(",");
-                    if ($.inArray(trailName, tagarr) == -1) {
-                        tags = tags + "," + trailName;
-                        // alert("tags after: " + tags);
-                        $.get(DELICIOUS_PROXY,
-                                {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: "www.dummy.com", tags: tags, replace: 'yes'}
-                        );
-                    }
-                }); // End update Dummy
-
+        /*
+         var jqxhr = $.get(DELICIOUS_PROXY,
+         {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/get', url: DUMMY_URL}
+         )
+         .done(function(data) {
+         
+         try {
+         console.log("tags\t" + tags);
+         tags = $(data.xml).contents().attr("tag").replace(/ /g, ",");
+         } catch (err) {
+         tags = "";
+         }
+         var tagarr = tags.split(",");
+         if ($.inArray(trailName, tagarr) == -1) {
+         tags = tags + "," + trailName;
+         // alert("tags after: " + tags);
+         $.get(DELICIOUS_PROXY,
+         {username: JSON_USERNAME, password: JSON_PASSWORD, method: 'posts/add', url: DUMMY_URL, tags: tags, replace:'yes'  }
+         );
+         }
+         }); // End update Dummy
+         */
         addEventLoadTrailItemsByTrail(trailName)
 
     });
