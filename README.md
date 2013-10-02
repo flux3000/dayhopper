@@ -11,9 +11,10 @@ Ryan Baker - JavaScripting
 Shaun Giudici - JavaScripting
 
 Technologies used
-jQuery, HTML, CSS
+jQuery, HTML, CSS, Delicious API
 
 Link to demo version
 http://dantsai.com/dayhopper/
 
 Known bugs
+none
