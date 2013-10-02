@@ -222,6 +222,7 @@ input[type=submit]{
 }
 .recommended-list li{
     padding:5px;
+    overflow:hidden;
     margin-bottom:0px;
     border-bottom: 1px dashed #DEEBF7;
 }
@@ -350,6 +351,7 @@ button.add-recommendation-to-memex {
     font-size: 10pt;
     width: 40px;
     height: 18px;
+    float:right;
     vertical-align: middle;
     font-family: 'Ropa Sans', sans-serif;    
 }
@@ -362,14 +364,14 @@ input#new-trail-name {
 }
 
 .trail-item-order{
-    display: none;
+    display: lock;
     z-index: 1;
     position:absolute;
-    text-align: right;
+    text-align: center;
     font-size: 50pt;
     width:340px;
     opacity:.1;
-    color: #4472C4
+    color: #4472C4;
 }
 
 /*.trail-item-order:hover{
