@@ -9,7 +9,7 @@ Ryan Baker - Added code for list item manipulation and rearrangement, and added 
 Shaun Giudici - JavaScript for creating a new list, CSS refinements
 
 Technologies used
-jQuery, HTML, CSS
+jQuery, HTML, CSS, Delicious API
 
 Link to demo version
 http://dantsai.com/dayhopper/
